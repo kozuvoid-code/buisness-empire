@@ -1009,8 +1009,8 @@
   // =========================
   // Supabase Setup
   // =========================
-  const SUPABASE_URL = "YOUR_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+  const SUPABASE_URL = "https://bhwlaeihghvxquhzihwy.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable__0V8-Fd66L5_4XvQdcg6Xw_YVkYPMrz";
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1036,7 +1036,7 @@
     bestNetWorth: 1000
   };
 
-  // Asset definitions (TON of content)
+  // Asset definitions
   const STOCKS = [
     { id: "FTSE_BLUE", name: "FTSE BlueChip ETF", type: "stocks", basePrice: 120, volatility: 0.03, incomeYield: 0.01, tagline: "Broad UK exposure, low volatility.", tags: ["Defensive", "Dividend"], sector: "Index" },
     { id: "UK_TECH", name: "Albion Cloud Systems", type: "stocks", basePrice: 80, volatility: 0.07, incomeYield: 0.0, tagline: "High‑growth UK SaaS darling.", tags: ["Growth", "Tech"], sector: "Technology" },

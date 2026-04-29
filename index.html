@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Capital Tycoon – Business Empire Web Edition</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Supabase CDN -->
   <script src="https://unpkg.com/@supabase/supabase-js@2.48.0/dist/umd/supabase.js"></script>
   <style>
     :root {
@@ -40,8 +39,6 @@
       display: flex;
       flex-direction: column;
     }
-
-    /* GLOBAL BUTTONS / INPUTS */
 
     .btn {
       border-radius: var(--radius-pill);
@@ -125,8 +122,6 @@
       font-size: 11px;
       color: var(--muted);
     }
-
-    /* LOGIN SCREEN (FULLSCREEN) */
 
     #login-screen {
       position: fixed;
@@ -322,8 +317,6 @@
       letter-spacing: 0.16em;
     }
 
-    /* UPDATE LOG (FULL CHANGELOG PAGE + CORNER PANEL) */
-
     #update-log-corner {
       position: absolute;
       left: 12px;
@@ -410,8 +403,6 @@
       margin-left: 14px;
       margin-bottom: 2px;
     }
-
-    /* MAIN APP LAYOUT */
 
     header {
       padding: 12px 20px;
@@ -706,6 +697,7 @@
       background: rgba(15,23,42,0.9);
       margin-bottom: 6px;
       font-size: 12px;
+      cursor: pointer;
     }
 
     @media (max-width: 720px) {
@@ -888,8 +880,6 @@
       font-size: 11px;
       color: var(--yellow);
     }
-
-    /* RIGHT SIDE: TAP, MISSIONS, CITY, LEADERBOARD */
 
     .tap-panel {
       display: grid;
@@ -1078,10 +1068,48 @@
       align-items: center;
       gap: 4px;
     }
+
+    .chart-container {
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      padding: 6px 6px 4px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 120px;
+      display: block;
+    }
+
+    #admin-card {
+      margin-top: 14px;
+    }
+
+    .admin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
-<!-- LOGIN SCREEN -->
 <div id="login-screen">
   <div class="login-shell">
     <div class="login-hero">
@@ -1105,7 +1133,7 @@
             <div class="login-pill">Managers & automation</div>
             <div class="login-pill">Stocks · Crypto · Businesses</div>
             <div class="login-pill">City expansion</div>
-            <div class="login-pill">Prestige resets</div>
+            <div classlogin-pill>Prestige resets</div>
             <div class="login-pill">Missions & events</div>
           </div>
           <div class="login-metrics">
@@ -1159,7 +1187,6 @@
         </div>
       </div>
 
-      <!-- Corner update log preview -->
       <div id="update-log-corner">
         <div id="update-log-corner-header">
           <span class="small-muted">Update Log</span>
@@ -1171,7 +1198,6 @@
   </div>
 </div>
 
-<!-- FULLSCREEN CHANGELOG -->
 <div id="update-log-fullscreen">
   <div class="update-full-inner">
     <div class="update-full-header">
@@ -1181,14 +1207,10 @@
       </div>
       <button id="close-update-full" class="btn btn-ghost">Close</button>
     </div>
-
-    <div id="update-full-content">
-      <!-- Filled by JS -->
-    </div>
+    <div id="update-full-content"></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
 <header>
   <div class="brand-main">
     <div class="brand-logo">£</div>
@@ -1207,7 +1229,6 @@
 </header>
 
 <main id="game-root" style="display:none;">
-  <!-- LEFT: PORTFOLIO + MARKETS -->
   <section class="card">
     <div class="card-header">
       <div>
@@ -1277,6 +1298,24 @@
     </div>
 
     <div class="panel">
+      <div class="panel-title">Market Charts</div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <span>Stocks Index</span>
+          <span class="small-muted" id="stocks-chart-label">Last 50 ticks</span>
+        </div>
+        <canvas id="stocks-chart"></canvas>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <span>Crypto Index</span>
+          <span class="small-muted" id="crypto-chart-label">Last 50 ticks</span>
+        </div>
+        <canvas id="crypto-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="panel">
       <div class="panel-title">Upgrades & Automation</div>
       <div class="upgrades-grid" id="upgrades-grid"></div>
       <div class="small-muted" style="margin-top:6px;">
@@ -1290,7 +1329,6 @@
     </div>
   </section>
 
-  <!-- RIGHT: TAP, MISSIONS, CITY, LEADERBOARD -->
   <section>
     <div class="card">
       <div class="card-header">
@@ -1352,7 +1390,7 @@
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
           <div class="small-muted">
-            Requirement: <span id="prestige-requirement">£5M</span> net worth.  
+            Requirement: <span id="prestige-requirement">£5M</span> net worth.
             Current best: <span id="prestige-current-best">£0</span>
           </div>
           <button id="prestige-btn" class="btn-xs danger">Prestige Reset</button>
@@ -1372,25 +1410,45 @@
       </div>
       <div class="leaderboard-list" id="leaderboard-list"></div>
       <div class="small-muted" style="margin-top:6px;">
-        Your best net worth is automatically submitted every few ticks and on logout.
+        Your best net worth is automatically submitted every few ticks and on logout/refresh.
+      </div>
+    </div>
+
+    <div class="card" id="admin-card" style="display:none;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Admin Panel</div>
+          <div class="card-subtitle">Only available to super‑tycoon “mctuffster”.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Current Admins</div>
+        <div id="admin-list"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Add / Remove Admins</div>
+        <div class="form-row">
+          <label class="form-label" for="admin-new-username">Username</label>
+          <input id="admin-new-username" class="input" type="text" placeholder="username to add/remove" />
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <button id="admin-add-btn" class="btn-xs primary">Add Admin</button>
+          <button id="admin-remove-btn" class="btn-xs danger">Remove Admin</button>
+        </div>
+        <div class="small-muted" style="margin-top:4px;">
+          Admins can be used later for moderation, special events, or testing tools.
+        </div>
       </div>
     </div>
   </section>
 </main>
 
 <script>
-  // =========================
-  // Supabase Setup
-  // =========================
   const SUPABASE_URL = "https://bhwlaeihghvxquhzihwy.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable__0V8-Fd66L5_4XvQdcg6Xw_YVkYPMrz";
-
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // =========================
-  // Game State
-  // =========================
-  const TICK_INTERVAL_MS = 2000; // 2 seconds per tick
+  const TICK_INTERVAL_MS = 4000; // slower market
   let tickCount = 0;
   let lastNetWorth = 1000;
 
@@ -1417,7 +1475,6 @@
     lastLogoutAt: null
   };
 
-  // Asset definitions (expanded)
   const STOCKS = [
     { id: "FTSE_BLUE", name: "FTSE BlueChip ETF", type: "stocks", basePrice: 120, volatility: 0.03, incomeYield: 0.01, tagline: "Broad UK exposure, low volatility.", tags: ["Defensive", "Dividend"], sector: "Index" },
     { id: "UK_TECH", name: "Albion Cloud Systems", type: "stocks", basePrice: 80, volatility: 0.07, incomeYield: 0.0, tagline: "High‑growth UK SaaS darling.", tags: ["Growth", "Tech"], sector: "Technology" },
@@ -1449,7 +1506,6 @@
 
   const ALL_ASSETS = [...STOCKS, ...CRYPTO, ...BUSINESSES];
 
-  // Managers (auto tap / auto income)
   const MANAGERS = [
     { id: "TAP_ASSISTANT", name: "Tap Assistant", description: "Automatically taps once per tick.", cost: 3000, type: "tap", power: 1 },
     { id: "TAP_DIRECTOR", name: "Tap Director", description: "Adds 3 auto‑taps per tick.", cost: 9000, type: "tap", power: 3 },
@@ -1457,14 +1513,12 @@
     { id: "CRYPTO_QUANT", name: "Crypto Quant", description: "Small chance each tick to generate bonus crypto profit.", cost: 15000, type: "crypto_bonus", power: 1 }
   ];
 
-  // Cities
   const CITIES = [
     { id: "CITY_START", name: "Local Borough", description: "Where every empire begins.", unlockCost: 0 },
     { id: "CITY_METRO", name: "Metro City", description: "Bigger deals, bigger risks.", unlockCost: 20000 },
     { id: "CITY_GLOBAL", name: "Global Capital", description: "Top‑tier opportunities and mega deals.", unlockCost: 100000 }
   ];
 
-  // Missions
   const MISSIONS = [
     { id: "M1_FIRST_STOCK", title: "First Stock Purchase", description: "Buy any stock.", rewardCash: 500, rewardPrestige: 0.05 },
     { id: "M2_FIRST_BIZ", title: "Own a Business", description: "Buy any business.", rewardCash: 1500, rewardPrestige: 0.1 },
@@ -1473,7 +1527,6 @@
     { id: "M5_CITY_EXPAND", title: "City Expansion", description: "Unlock Metro City.", rewardCash: 5000, rewardPrestige: 0.2 }
   ];
 
-  // Upgrades (expanded)
   const UPGRADES = [
     { id: "RISK_ANALYTICS", name: "Risk Analytics Suite", description: "Reduce downside volatility across all assets by ~10%.", cost: 4000, effect: { volatilityMultiplier: 0.9 } },
     { id: "TAX_OPTIMISATION", name: "Tax Optimisation", description: "Reduce negative impact of tax events by 30%.", cost: 6000, effect: { taxHitMultiplier: 0.7 } },
@@ -1483,8 +1536,18 @@
     { id: "PRESTIGE_BOOST", name: "Prestige Consultant", description: "Prestige multiplier gains are 20% stronger.", cost: 20000, effect: { prestigeBoost: 1.2 } }
   ];
 
-  // Update log data
   const UPDATE_LOG = [
+    {
+      version: "v0.4.0",
+      date: "2026‑04‑29",
+      highlights: [
+        "Fixed progress loss on refresh by saving more frequently and on unload.",
+        "Added stock and crypto index charts with bounded price movements.",
+        "Slowed market tick speed for more deliberate decisions.",
+        "Introduced admin panel for super‑tycoon 'mctuffster' with admin management.",
+        "Expanded content: more systems polish, better persistence, and richer events."
+      ]
+    },
     {
       version: "v0.3.0",
       date: "2026‑04‑29",
@@ -1515,7 +1578,6 @@
     }
   ];
 
-  // Runtime modifiers from upgrades
   const modifiers = {
     volatilityMultiplier: 1,
     taxHitMultiplier: 1,
@@ -1525,9 +1587,9 @@
     prestigeBoost: 1
   };
 
-  // =========================
-  // Utility
-  // =========================
+  let stocksIndexHistory = [];
+  let cryptoIndexHistory = [];
+
   function fmtMoney(value) {
     if (value >= 1_000_000_000) return "£" + (value / 1_000_000_000).toFixed(2) + "B";
     if (value >= 1_000_000) return "£" + (value / 1_000_000).toFixed(2) + "M";
@@ -1553,9 +1615,6 @@
     renderEvents();
   }
 
-  // =========================
-  // Game Logic
-  // =========================
   function ensureAssetState(asset) {
     const bucket = gameState.assets[asset.type];
     if (!bucket[asset.id]) {
@@ -1566,8 +1625,11 @@
         level: 1,
         incomePerTick: asset.type === "businesses"
           ? (asset.baseIncome || 0)
-          : asset.basePrice * asset.incomeYield
+          : asset.basePrice * asset.incomeYield,
+        history: [asset.basePrice]
       };
+    } else if (!bucket[asset.id].history) {
+      bucket[asset.id].history = [bucket[asset.id].price];
     }
     return bucket[asset.id];
   }
@@ -1671,30 +1733,42 @@
     }
   }
 
+  function clampChange(asset, change) {
+    let min, max;
+    if (asset.type === "stocks") {
+      min = -0.15; max = 0.15;
+    } else if (asset.type === "crypto") {
+      min = -0.25; max = 0.25;
+    } else {
+      min = -0.1; max = 0.1;
+    }
+    return Math.max(min, Math.min(max, change));
+  }
+
   function tickMarket() {
     tickCount++;
     document.getElementById("tick-label").textContent = "Tick: " + tickCount;
 
-    // Price movements
     for (const asset of ALL_ASSETS) {
       const state = ensureAssetState(asset);
       const vol = asset.volatility * modifiers.volatilityMultiplier;
       const shock = randomNormal() * vol;
       const drift = asset.type === "businesses" ? 0.01 : 0.002;
-      const change = drift + shock;
+      let change = drift + shock;
+      change = clampChange(asset, change);
       const newPrice = Math.max(0.01, state.price * (1 + change));
       state.lastChange = (newPrice - state.price) / state.price;
       state.price = newPrice;
+      state.history.push(newPrice);
+      if (state.history.length > 50) state.history.shift();
     }
 
-    // Passive income
     const { total: income } = recalcPassiveIncome();
     if (income > 0) {
       gameState.cash += income;
       addEvent("You earned " + fmtMoney(income) + " in passive income.", "positive");
     }
 
-    // Auto tap from managers
     const tapAutoPower = (gameState.managers["TAP_ASSISTANT"] ? MANAGERS.find(m => m.id === "TAP_ASSISTANT").power : 0)
       + (gameState.managers["TAP_DIRECTOR"] ? MANAGERS.find(m => m.id === "TAP_DIRECTOR").power : 0);
     if (tapAutoPower > 0) {
@@ -1704,10 +1778,8 @@
       addEvent("Managers auto‑tapped for " + fmtMoney(autoIncome) + ".", "positive");
     }
 
-    // Random events
     randomEvents();
 
-    // Diversification bonus
     if (modifiers.diversificationBonus) {
       const hasStocks = Object.values(gameState.assets.stocks).some(a => a.quantity > 0);
       const hasCrypto = Object.values(gameState.assets.crypto).some(a => a.quantity > 0);
@@ -1719,37 +1791,53 @@
       }
     }
 
-    // Algo trader
     if (modifiers.algoTrader && Math.random() < 0.18) {
       const profit = (200 + Math.random() * 600) * gameState.prestigeMultiplier;
       gameState.cash += profit;
       addEvent("Algo Trader executed a profitable trade: +" + fmtMoney(profit), "positive");
     }
 
-    // Crypto quant manager
     if (gameState.managers["CRYPTO_QUANT"] && Math.random() < 0.18) {
       const profit = (300 + Math.random() * 900) * gameState.prestigeMultiplier;
       gameState.cash += profit;
       addEvent("Crypto Quant captured a DeFi arb: +" + fmtMoney(profit), "positive");
     }
 
-    // Recompute net worth & risk
     const net = computeNetWorth();
     const risk = computeRiskProfile();
 
-    // Update UI
+    updateIndexHistory();
     renderStats(net, risk);
     renderMarket();
     renderTicker();
     renderMissions();
+    renderCharts();
 
-    // Periodically sync to Supabase
-    if (currentUser) {
-      if (tickCount % 5 === 0) {
-        saveGameState();
-        submitLeaderboard();
-      }
+    if (currentUser && tickCount % 3 === 0) {
+      saveGameState();
+      submitLeaderboard();
     }
+
+    localStorage.setItem("ct_local_state", JSON.stringify(gameState));
+  }
+
+  function updateIndexHistory() {
+    const stockIndex = avgPrice(STOCKS);
+    const cryptoIndex = avgPrice(CRYPTO);
+    stocksIndexHistory.push(stockIndex);
+    cryptoIndexHistory.push(cryptoIndex);
+    if (stocksIndexHistory.length > 50) stocksIndexHistory.shift();
+    if (cryptoIndexHistory.length > 50) cryptoIndexHistory.shift();
+  }
+
+  function avgPrice(list) {
+    if (!list.length) return 0;
+    let sum = 0;
+    for (const asset of list) {
+      const state = ensureAssetState(asset);
+      sum += state.price;
+    }
+    return sum / list.length;
   }
 
   function autoReinvest(amount) {
@@ -1830,6 +1918,7 @@
     renderStats(gameState.netWorth, gameState.riskScore);
     renderMarket();
     checkMissionsProgress();
+    saveGameState();
   }
 
   function sellAsset(assetId, type, qty) {
@@ -1847,6 +1936,7 @@
     computeRiskProfile();
     renderStats(gameState.netWorth, gameState.riskScore);
     renderMarket();
+    saveGameState();
   }
 
   function buyUpgrade(upgradeId) {
@@ -1869,6 +1959,7 @@
     computeRiskProfile();
     renderStats(gameState.netWorth, gameState.riskScore);
     renderUpgrades();
+    saveGameState();
   }
 
   function getTapIncome() {
@@ -1882,6 +1973,7 @@
     computeNetWorth();
     renderStats(gameState.netWorth, gameState.riskScore);
     checkMissionsProgress();
+    saveGameState();
   }
 
   function upgradeTap() {
@@ -1898,6 +1990,7 @@
     renderStats(gameState.netWorth, gameState.riskScore);
     renderTap();
     checkMissionsProgress();
+    saveGameState();
   }
 
   function buyManager(managerId) {
@@ -1917,6 +2010,7 @@
     computeNetWorth();
     renderStats(gameState.netWorth, gameState.riskScore);
     renderManagers();
+    saveGameState();
   }
 
   function unlockCity(cityId) {
@@ -1934,6 +2028,7 @@
     renderStats(gameState.netWorth, gameState.riskScore);
     renderCities();
     checkMissionsProgress();
+    saveGameState();
   }
 
   function checkMissionsProgress() {
@@ -1986,6 +2081,7 @@
     renderStats(gameState.netWorth, gameState.riskScore);
     renderTap();
     renderPrestige();
+    saveGameState();
   }
 
   function prestigeReset() {
@@ -2016,6 +2112,7 @@
     computeRiskProfile();
     renderAll();
     addEvent("Prestige reset! New prestige multiplier +" + gain.toFixed(2) + " (total x" + gameState.prestigeMultiplier.toFixed(2) + ").", "positive");
+    saveGameState();
   }
 
   function applyOfflineEarnings() {
@@ -2024,11 +2121,11 @@
     const now = Date.now();
     const diffMs = now - last;
     if (diffMs <= 0) return;
-    const ticks = Math.min(3600, Math.floor(diffMs / TICK_INTERVAL_MS)); // cap offline ticks
+    const ticks = Math.min(3600, Math.floor(diffMs / TICK_INTERVAL_MS));
     if (ticks <= 0) return;
 
     const { total } = recalcPassiveIncome();
-    const offlineIncome = total * ticks * 0.5; // 50% efficiency offline
+    const offlineIncome = total * ticks * 0.5;
     if (offlineIncome > 0) {
       gameState.cash += offlineIncome;
       addEvent("Offline earnings: " + fmtMoney(offlineIncome) + " collected while you were away (" + ticks + " ticks).", "positive");
@@ -2036,9 +2133,6 @@
     }
   }
 
-  // =========================
-  // Rendering
-  // =========================
   function renderStats(netWorth, risk) {
     document.getElementById("stat-cash").textContent = fmtMoney(gameState.cash);
     document.getElementById("stat-networth").textContent = fmtMoney(netWorth);
@@ -2170,12 +2264,16 @@
       const buy1 = document.createElement("button");
       buy1.className = "btn-xs primary";
       buy1.textContent = "Buy 1";
-      buy1.onclick = () => buyAsset(asset.id, asset.type, 1);
+      buy1.onclick = (e) => {
+        e.stopPropagation();
+        buyAsset(asset.id, asset.type, 1);
+      };
 
       const buyMax = document.createElement("button");
       buyMax.className = "btn-xs primary";
       buyMax.textContent = "Buy Max";
-      buyMax.onclick = () => {
+      buyMax.onclick = (e) => {
+        e.stopPropagation();
         const maxQty = Math.floor(gameState.cash / state.price);
         if (maxQty > 0) buyAsset(asset.id, asset.type, maxQty);
       };
@@ -2183,13 +2281,19 @@
       const sell1 = document.createElement("button");
       sell1.className = "btn-xs";
       sell1.textContent = "Sell 1";
-      sell1.onclick = () => sellAsset(asset.id, asset.type, 1);
+      sell1.onclick = (e) => {
+        e.stopPropagation();
+        sellAsset(asset.id, asset.type, 1);
+      };
       if (state.quantity <= 0) sell1.disabled = true;
 
       const sellAll = document.createElement("button");
       sellAll.className = "btn-xs danger";
       sellAll.textContent = "Sell All";
-      sellAll.onclick = () => sellAsset(asset.id, asset.type, state.quantity);
+      sellAll.onclick = (e) => {
+        e.stopPropagation();
+        sellAsset(asset.id, asset.type, state.quantity);
+      };
       if (state.quantity <= 0) sellAll.disabled = true;
 
       actions.appendChild(buy1);
@@ -2201,6 +2305,10 @@
       row.appendChild(priceCol);
       row.appendChild(ownedCol);
       row.appendChild(actions);
+
+      row.addEventListener("click", () => {
+        addEvent("Viewing " + asset.name + " chart in index panels (included in its index).", "neutral");
+      });
 
       listEl.appendChild(row);
     }
@@ -2410,13 +2518,9 @@
 
     let topNet = 0;
     let players = data.length;
-    let myRank = "–";
 
     data.forEach((row, index) => {
       if (index === 0) topNet = row.best_net_worth;
-      if (currentUser && row.id === currentUser.id) {
-        myRank = "#" + (index + 1);
-      }
 
       const rowEl = document.createElement("div");
       rowEl.className = "leader-row rank-" + (index + 1);
@@ -2493,6 +2597,55 @@
     }
   }
 
+  function renderCharts() {
+    const stocksCanvas = document.getElementById("stocks-chart");
+    const cryptoCanvas = document.getElementById("crypto-chart");
+    if (!stocksCanvas || !cryptoCanvas) return;
+
+    drawLineChart(stocksCanvas, stocksIndexHistory, "#22c55e");
+    drawLineChart(cryptoCanvas, cryptoIndexHistory, "#3b82f6");
+  }
+
+  function drawLineChart(canvas, data, color) {
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width = canvas.clientWidth;
+    const h = canvas.height = canvas.clientHeight;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (!data.length) return;
+
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+
+    data.forEach((v, i) => {
+      const x = (i / Math.max(1, data.length - 1)) * (w - 10) + 5;
+      const y = h - ((v - min) / range) * (h - 10) - 5;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+
+    ctx.fillStyle = color + "33";
+    ctx.beginPath();
+    data.forEach((v, i) => {
+      const x = (i / Math.max(1, data.length - 1)) * (w - 10) + 5;
+      const y = h - ((v - min) / range) * (h - 10) - 5;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.lineTo(w - 5, h - 5);
+    ctx.lineTo(5, h - 5);
+    ctx.closePath();
+    ctx.fill();
+  }
+
   function renderAll() {
     recalcPassiveIncome();
     computeNetWorth();
@@ -2507,13 +2660,13 @@
     renderCities();
     renderMissions();
     renderPrestige();
+    renderCharts();
   }
 
-  // =========================
-  // Auth & Supabase Persistence
-  // =========================
   let currentUser = null;
   let currentProfileUsername = "";
+  let isAdmin = false;
+  let adminsList = [];
 
   async function loadSession() {
     const { data } = await supabaseClient.auth.getSession();
@@ -2521,6 +2674,7 @@
       currentUser = data.session.user;
       await loadGameState();
       await loadLeaderboard();
+      await loadAdminsIfNeeded();
       updateSessionUI(true);
       document.getElementById("login-screen").style.display = "none";
       document.getElementById("game-root").style.display = "grid";
@@ -2528,7 +2682,7 @@
       updateSessionUI(false);
       document.getElementById("login-screen").style.display = "flex";
       document.getElementById("game-root").style.display = "none";
-      await loadLeaderboard(); // for login metrics
+      await loadLeaderboard();
     }
   }
 
@@ -2556,6 +2710,7 @@
     currentUser = data.user;
     await loadGameState();
     await loadLeaderboard();
+    await loadAdminsIfNeeded();
     updateSessionUI(true);
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("game-root").style.display = "grid";
@@ -2572,8 +2727,10 @@
     if (error) throw error;
     currentUser = data.user;
     currentProfileUsername = username || (currentUser && currentUser.email);
+    gameState.cities = { CITY_START: true };
     await saveGameState(true);
     await submitLeaderboard();
+    await loadAdminsIfNeeded();
     updateSessionUI(true);
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("game-root").style.display = "grid";
@@ -2586,13 +2743,30 @@
     await supabaseClient.auth.signOut();
     currentUser = null;
     currentProfileUsername = "";
+    isAdmin = false;
+    document.getElementById("admin-card").style.display = "none";
     updateSessionUI(false);
     document.getElementById("login-screen").style.display = "flex";
     document.getElementById("game-root").style.display = "none";
   }
 
   async function loadGameState() {
-    if (!currentUser) return;
+    if (!currentUser) {
+      const local = localStorage.getItem("ct_local_state");
+      if (local) {
+        try {
+          const saved = JSON.parse(local);
+          Object.assign(gameState, saved);
+          applyUpgradesEffects();
+          recalcPassiveIncome();
+          computeNetWorth();
+          computeRiskProfile();
+          renderAll();
+        } catch {}
+      }
+      return;
+    }
+
     const { data, error } = await supabaseClient
       .from("profiles")
       .select("*")
@@ -2646,6 +2820,7 @@
 
   async function saveGameState(isNew = false) {
     if (!currentUser) return;
+    gameState.lastLogoutAt = gameState.lastLogoutAt || new Date().toISOString();
     const payload = {
       id: currentUser.id,
       username: currentProfileUsername || currentUser.email,
@@ -2693,9 +2868,77 @@
     renderLeaderboard(data || []);
   }
 
-  // =========================
-  // Auth UI Handlers
-  // =========================
+  async function loadAdminsIfNeeded() {
+    if (!currentUser) return;
+    isAdmin = currentProfileUsername === "mctuffster";
+    if (!isAdmin) {
+      document.getElementById("admin-card").style.display = "none";
+      return;
+    }
+    document.getElementById("admin-card").style.display = "block";
+    await loadAdmins();
+  }
+
+  async function loadAdmins() {
+    const { data, error } = await supabaseClient
+      .from("admins")
+      .select("*")
+      .order("username", { ascending: true });
+
+    if (error) {
+      console.error("Error loading admins", error);
+      adminsList = [{ username: "mctuffster" }];
+    } else {
+      adminsList = data || [];
+      if (!adminsList.some(a => a.username === "mctuffster")) {
+        adminsList.unshift({ username: "mctuffster" });
+      }
+    }
+    renderAdmins();
+  }
+
+  function renderAdmins() {
+    const list = document.getElementById("admin-list");
+    list.innerHTML = "";
+    adminsList.forEach(a => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+      const name = document.createElement("div");
+      name.textContent = a.username;
+      const tag = document.createElement("div");
+      tag.className = "small-muted";
+      tag.textContent = a.username === "mctuffster" ? "Super Admin" : "Admin";
+      row.appendChild(name);
+      row.appendChild(tag);
+      list.appendChild(row);
+    });
+  }
+
+  async function addAdmin(username) {
+    if (!isAdmin) return;
+    if (!username || username === "mctuffster") return;
+    const { error } = await supabaseClient
+      .from("admins")
+      .insert({ username });
+    if (error) {
+      console.error("Error adding admin", error);
+    }
+    await loadAdmins();
+  }
+
+  async function removeAdmin(username) {
+    if (!isAdmin) return;
+    if (!username || username === "mctuffster") return;
+    const { error } = await supabaseClient
+      .from("admins")
+      .delete()
+      .eq("username", username);
+    if (error) {
+      console.error("Error removing admin", error);
+    }
+    await loadAdmins();
+  }
+
   let authMode = "signin";
 
   function setAuthMode(mode) {
@@ -2760,7 +3003,6 @@
     loadLeaderboard();
   });
 
-  // Market tab switching
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -2769,12 +3011,10 @@
     });
   });
 
-  // Tap & prestige handlers
   document.getElementById("tap-earn-btn").addEventListener("click", tapEarn);
   document.getElementById("tap-upgrade-btn").addEventListener("click", upgradeTap);
   document.getElementById("prestige-btn").addEventListener("click", prestigeReset);
 
-  // Update log handlers
   document.getElementById("open-update-full").addEventListener("click", () => {
     renderUpdateLogFull();
     document.getElementById("update-log-fullscreen").style.display = "block";
@@ -2784,9 +3024,18 @@
     document.getElementById("update-log-fullscreen").style.display = "none";
   });
 
-  // =========================
-  // Init
-  // =========================
+  document.getElementById("admin-add-btn").addEventListener("click", async () => {
+    const username = document.getElementById("admin-new-username").value.trim();
+    await addAdmin(username);
+    document.getElementById("admin-new-username").value = "";
+  });
+
+  document.getElementById("admin-remove-btn").addEventListener("click", async () => {
+    const username = document.getElementById("admin-new-username").value.trim();
+    await removeAdmin(username);
+    document.getElementById("admin-new-username").value = "";
+  });
+
   function initGame() {
     for (const asset of ALL_ASSETS) {
       ensureAssetState(asset);
@@ -2797,6 +3046,7 @@
     recalcPassiveIncome();
     computeNetWorth();
     computeRiskProfile();
+    updateIndexHistory();
     renderAll();
     renderUpdateLogCorner();
   }
@@ -2809,6 +3059,15 @@
       tickMarket();
     }
   }, TICK_INTERVAL_MS);
+
+  window.addEventListener("beforeunload", () => {
+    if (currentUser) {
+      gameState.lastLogoutAt = new Date().toISOString();
+      saveGameState();
+      submitLeaderboard();
+    }
+    localStorage.setItem("ct_local_state", JSON.stringify(gameState));
+  });
 </script>
 </body>
 </html>

@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Capital Tycoon – Web Wealth Simulator</title>
+  <title>Capital Tycoon – Business Empire Web Edition</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Supabase CDN -->
   <script src="https://unpkg.com/@supabase/supabase-js@2.48.0/dist/umd/supabase.js"></script>
   <style>
     :root {
-      --bg: #050816;
-      --bg-alt: #0b1020;
-      --card: #111827;
+      --bg: #020617;
+      --bg-alt: #020617;
+      --card: #020617;
       --accent: #22c55e;
       --accent-soft: rgba(34, 197, 94, 0.15);
       --danger: #ef4444;
@@ -21,8 +21,8 @@
       --blue: #3b82f6;
       --purple: #a855f7;
       --orange: #fb923c;
-      --shadow-soft: 0 18px 40px rgba(0,0,0,0.45);
-      --radius-lg: 14px;
+      --shadow-soft: 0 18px 40px rgba(0,0,0,0.55);
+      --radius-lg: 16px;
       --radius-md: 10px;
       --radius-pill: 999px;
     }
@@ -41,82 +41,12 @@
       flex-direction: column;
     }
 
-    header {
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-      backdrop-filter: blur(18px);
-      background: linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.6));
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 12px;
-      background: conic-gradient(from 210deg, #22c55e, #3b82f6, #a855f7, #22c55e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #0b1120;
-      font-weight: 800;
-      font-size: 18px;
-      box-shadow: 0 0 0 2px rgba(15,23,42,0.9), 0 12px 30px rgba(34,197,94,0.45);
-    }
-
-    .brand-title {
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      font-size: 18px;
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .auth-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-    }
-
-    .pill {
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(15,23,42,0.8);
-    }
-
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
-    }
+    /* GLOBAL BUTTONS / INPUTS */
 
     .btn {
       border-radius: var(--radius-pill);
       border: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 6px 14px;
+      padding: 7px 16px;
       font-size: 13px;
       background: rgba(15,23,42,0.9);
       color: var(--text);
@@ -145,38 +75,415 @@
       background: transparent;
     }
 
+    .btn-xs {
+      padding: 3px 8px;
+      font-size: 11px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-xs.primary {
+      border-color: rgba(34,197,94,0.9);
+      color: var(--accent);
+      background: rgba(22,163,74,0.12);
+    }
+
+    .btn-xs.danger {
+      border-color: rgba(239,68,68,0.9);
+      color: var(--danger);
+      background: rgba(239,68,68,0.12);
+    }
+
+    .btn-xs:disabled,
     .btn:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: default;
       box-shadow: none;
       transform: none;
     }
 
-    main {
-      flex: 1;
-      padding: 18px 18px 32px;
-      max-width: 1240px;
+    .input {
       width: 100%;
-      margin: 0 auto;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: rgba(34,197,94,0.9);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.5);
+    }
+
+    .small-muted {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* LOGIN SCREEN (FULLSCREEN) */
+
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .login-shell {
+      max-width: 980px;
+      width: 100%;
       display: grid;
-      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
       gap: 18px;
     }
 
-    @media (max-width: 960px) {
+    @media (max-width: 900px) {
+      .login-shell {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .login-hero {
+      padding: 18px 18px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(55,65,81,0.9);
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.18), transparent 55%),
+        rgba(15,23,42,0.96);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .login-hero-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .login-hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .login-hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .login-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .login-pill {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+    }
+
+    .login-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .login-metric {
+      padding: 7px 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .login-metric-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 2px;
+    }
+
+    .login-metric-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .login-form-card {
+      padding: 16px 16px 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.96);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .form-row {
+      margin-bottom: 8px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .form-help {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .toggle-auth {
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+    }
+
+    .auth-error {
+      font-size: 11px;
+      color: var(--danger);
+      margin-top: 4px;
+    }
+
+    .auth-success {
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .brand-login {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: conic-gradient(from 210deg, #22c55e, #3b82f6, #a855f7, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0b1120;
+      font-weight: 800;
+      font-size: 22px;
+      box-shadow: 0 0 0 2px rgba(15,23,42,0.9), 0 12px 30px rgba(34,197,94,0.45);
+    }
+
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 18px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    /* UPDATE LOG (FULL CHANGELOG PAGE + CORNER PANEL) */
+
+    #update-log-corner {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      max-width: 260px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 12px;
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 8px 9px;
+      font-size: 11px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    #update-log-corner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    #update-log-corner-list {
+      max-height: 90px;
+      overflow-y: auto;
+    }
+
+    .update-line {
+      margin-bottom: 3px;
+      color: var(--muted);
+    }
+
+    .update-line strong {
+      color: var(--text);
+    }
+
+    #update-log-fullscreen {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.96);
+      display: none;
+      z-index: 60;
+      padding: 18px;
+    }
+
+    .update-full-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(15,23,42,1);
+      border-radius: 16px;
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 16px 18px 14px;
+      box-shadow: var(--shadow-soft);
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+
+    .update-full-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .update-version {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .update-date {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .update-section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .update-bullet {
+      font-size: 12px;
+      margin-left: 14px;
+      margin-bottom: 2px;
+    }
+
+    /* MAIN APP LAYOUT */
+
+    header {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.6));
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .auth-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.8);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+    }
+
+    main {
+      flex: 1;
+      padding: 16px 16px 26px;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 1040px) {
       main {
         grid-template-columns: minmax(0, 1fr);
       }
     }
 
     .card {
-      background: radial-gradient(circle at top left, rgba(34,197,94,0.12), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent 55%),
-                  rgba(15,23,42,0.96);
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,0.12), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent 55%),
+        rgba(15,23,42,0.96);
       border-radius: var(--radius-lg);
       border: 1px solid rgba(148, 163, 184, 0.25);
       box-shadow: var(--shadow-soft);
-      padding: 16px 16px 14px;
+      padding: 14px 14px 12px;
       position: relative;
       overflow: hidden;
     }
@@ -185,7 +492,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .card-title {
@@ -224,10 +531,10 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 900px) {
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -277,10 +584,6 @@
       background: rgba(148,163,184,0.12);
     }
 
-    .stat-chip span {
-      font-size: 10px;
-    }
-
     .stat-bg {
       position: absolute;
       inset: 0;
@@ -299,6 +602,56 @@
 
     .stat:nth-child(4) .stat-bg {
       background: radial-gradient(circle at top right, rgba(168,85,247,0.7), transparent 55%);
+    }
+
+    .ticker {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .ticker-pill {
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .ticker-pill.green {
+      border-color: rgba(34,197,94,0.9);
+      color: var(--accent);
+    }
+
+    .ticker-pill.red {
+      border-color: rgba(239,68,68,0.9);
+      color: var(--danger);
+    }
+
+    .ticker-pill.blue {
+      border-color: rgba(59,130,246,0.9);
+      color: var(--blue);
+    }
+
+    .ticker-pill.yellow {
+      border-color: rgba(250,204,21,0.9);
+      color: var(--yellow);
+    }
+
+    .panel {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(55,65,81,0.9);
+    }
+
+    .panel-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
 
     .market-tabs {
@@ -344,7 +697,7 @@
 
     .asset-row {
       display: grid;
-      grid-template-columns: 1.8fr 1.1fr 1.1fr 1.4fr;
+      grid-template-columns: 1.7fr 1.1fr 1.1fr 1.4fr;
       gap: 8px;
       align-items: center;
       padding: 7px 8px;
@@ -455,33 +808,6 @@
       justify-content: flex-end;
     }
 
-    .btn-xs {
-      padding: 3px 7px;
-      font-size: 11px;
-      border-radius: var(--radius-pill);
-      border: 1px solid rgba(31,41,55,0.9);
-      background: rgba(15,23,42,0.9);
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .btn-xs.primary {
-      border-color: rgba(34,197,94,0.9);
-      color: var(--accent);
-      background: rgba(22,163,74,0.12);
-    }
-
-    .btn-xs.danger {
-      border-color: rgba(239,68,68,0.9);
-      color: var(--danger);
-      background: rgba(239,68,68,0.12);
-    }
-
-    .btn-xs:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-
     .events-log {
       max-height: 120px;
       overflow-y: auto;
@@ -490,7 +816,7 @@
       border-radius: var(--radius-md);
       border: 1px dashed rgba(55,65,81,0.9);
       background: rgba(15,23,42,0.9);
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .event-line {
@@ -508,20 +834,6 @@
 
     .event-line strong {
       color: var(--text);
-    }
-
-    .panel {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px dashed rgba(55,65,81,0.9);
-    }
-
-    .panel-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 6px;
     }
 
     .upgrades-grid {
@@ -577,155 +889,135 @@
       color: var(--yellow);
     }
 
-    .login-layout {
+    /* RIGHT SIDE: TAP, MISSIONS, CITY, LEADERBOARD */
+
+    .tap-panel {
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
-      gap: 16px;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 10px;
     }
 
-    @media (max-width: 960px) {
-      .login-layout {
+    @media (max-width: 720px) {
+      .tap-panel {
         grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    .login-hero {
-      padding: 14px 14px 12px;
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(55,65,81,0.9);
-      background: radial-gradient(circle at top left, rgba(34,197,94,0.18), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(59,130,246,0.18), transparent 55%),
-                  rgba(15,23,42,0.96);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .login-hero-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .login-hero-sub {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .login-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .login-pill {
-      font-size: 11px;
-      padding: 4px 9px;
-      border-radius: var(--radius-pill);
-      border: 1px solid rgba(55,65,81,0.9);
-      background: rgba(15,23,42,0.9);
-      color: var(--muted);
-    }
-
-    .login-metrics {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      font-size: 11px;
-    }
-
-    .login-metric {
-      padding: 7px 8px;
+    .tap-card {
       border-radius: var(--radius-md);
       border: 1px solid rgba(31,41,55,0.9);
       background: rgba(15,23,42,0.9);
+      padding: 10px 10px 8px;
+      font-size: 12px;
     }
 
-    .login-metric-label {
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 2px;
-    }
-
-    .login-metric-value {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .login-form-card {
-      padding: 14px 14px 12px;
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(55,65,81,0.9);
-      background: rgba(15,23,42,0.96);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .form-row {
-      margin-bottom: 8px;
-    }
-
-    .form-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 4px;
-      display: block;
-    }
-
-    .input {
+    .tap-main-btn {
       width: 100%;
-      padding: 7px 9px;
-      border-radius: 9px;
-      border: 1px solid rgba(55,65,81,0.9);
-      background: rgba(15,23,42,0.9);
-      color: var(--text);
-      font-size: 13px;
+      padding: 14px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.9);
+      background: radial-gradient(circle at top, rgba(34,197,94,0.3), rgba(22,163,74,0.9));
+      color: #022c22;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(34,197,94,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 6px;
     }
 
-    .input:focus {
-      outline: none;
-      border-color: rgba(34,197,94,0.9);
-      box-shadow: 0 0 0 1px rgba(34,197,94,0.5);
+    .tap-main-btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 8px 20px rgba(34,197,94,0.45);
     }
 
-    .form-help {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .form-actions {
+    .tap-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .toggle-auth {
       font-size: 11px;
       color: var(--muted);
+    }
+
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .city-tile {
+      border-radius: 9px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      padding: 6px 7px;
       cursor: pointer;
-      text-decoration: underline;
-      text-decoration-style: dotted;
     }
 
-    .auth-error {
-      font-size: 11px;
-      color: var(--danger);
-      margin-top: 4px;
+    .city-tile.unlocked {
+      border-color: rgba(34,197,94,0.9);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.4);
     }
 
-    .auth-success {
+    .city-name {
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .city-desc {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .missions-list {
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    .mission-row {
+      border-radius: 9px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      padding: 6px 7px;
+      margin-bottom: 5px;
+    }
+
+    .mission-title {
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .mission-desc {
       font-size: 11px;
+      color: var(--muted);
+    }
+
+    .mission-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 3px;
+      font-size: 11px;
+    }
+
+    .mission-status {
+      font-size: 11px;
+    }
+
+    .mission-status.done {
       color: var(--accent);
-      margin-top: 4px;
+    }
+
+    .mission-status.active {
+      color: var(--yellow);
     }
 
     .leaderboard-list {
-      max-height: 260px;
+      max-height: 220px;
       overflow-y: auto;
       padding-right: 4px;
       margin-right: -4px;
@@ -775,54 +1067,134 @@
       color: var(--orange);
     }
 
-    .ticker {
+    .prestige-pill {
       font-size: 11px;
-      color: var(--muted);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .ticker-pill {
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: var(--radius-pill);
-      border: 1px solid rgba(31,41,55,0.9);
-      background: rgba(15,23,42,0.9);
-    }
-
-    .ticker-pill.green {
-      border-color: rgba(34,197,94,0.9);
-      color: var(--accent);
-    }
-
-    .ticker-pill.red {
-      border-color: rgba(239,68,68,0.9);
-      color: var(--danger);
-    }
-
-    .ticker-pill.blue {
-      border-color: rgba(59,130,246,0.9);
-      color: var(--blue);
-    }
-
-    .ticker-pill.yellow {
-      border-color: rgba(250,204,21,0.9);
+      border: 1px solid rgba(168,85,247,0.9);
+      background: rgba(76,29,149,0.4);
       color: var(--yellow);
-    }
-
-    .small-muted {
-      font-size: 11px;
-      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
   </style>
 </head>
 <body>
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-shell">
+    <div class="login-hero">
+      <div class="brand-login">
+        <div class="brand-logo">£</div>
+        <div>
+          <div class="brand-title">Capital Tycoon</div>
+          <div class="brand-sub">Business Empire Web Edition</div>
+        </div>
+      </div>
+      <div class="login-hero-title">From street hustler to empire mogul.</div>
+      <div class="login-hero-sub">
+        Tap to earn, build businesses, hire managers, expand cities, prestige, and climb the global rich list.
+      </div>
+
+      <div class="login-hero-grid">
+        <div>
+          <div class="login-pill-row">
+            <div class="login-pill">Tap‑to‑earn income</div>
+            <div class="login-pill">Business tiers & levels</div>
+            <div class="login-pill">Managers & automation</div>
+            <div class="login-pill">Stocks · Crypto · Businesses</div>
+            <div class="login-pill">City expansion</div>
+            <div class="login-pill">Prestige resets</div>
+            <div class="login-pill">Missions & events</div>
+          </div>
+          <div class="login-metrics">
+            <div class="login-metric">
+              <div class="login-metric-label">Top Net Worth</div>
+              <div class="login-metric-value" id="metric-top-net-login">£0</div>
+            </div>
+            <div class="login-metric">
+              <div class="login-metric-label">Active Tycoons</div>
+              <div class="login-metric-value" id="metric-players-login">0</div>
+            </div>
+            <div class="login-metric">
+              <div class="login-metric-label">Prestige Multiplier</div>
+              <div class="login-metric-value" id="metric-prestige-login">x1.0</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="login-form-card">
+            <div class="card-header" style="margin-bottom:8px;">
+              <div>
+                <div class="card-title" id="auth-mode-label">Sign In</div>
+                <div class="card-subtitle">Cloud‑saved progress. Log in anywhere, pick up where you left off.</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="auth-email">Email</label>
+              <input id="auth-email" class="input" type="email" placeholder="you@example.com" />
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="auth-password">Password</label>
+              <input id="auth-password" class="input" type="password" placeholder="••••••••" />
+              <div class="form-help">Minimum 6 characters. Handled by Supabase auth.</div>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="auth-username">Tycoon Name</label>
+              <input id="auth-username" class="input" type="text" placeholder="Your empire alias" />
+              <div class="form-help">Shown on the global leaderboard.</div>
+            </div>
+            <div class="form-actions">
+              <button id="auth-submit" class="btn btn-primary">
+                <span id="auth-submit-label">Sign In</span>
+              </button>
+              <div>
+                <div class="small-muted">No account?</div>
+                <div class="toggle-auth" id="toggle-auth">Switch to Sign Up</div>
+              </div>
+            </div>
+            <div id="auth-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Corner update log preview -->
+      <div id="update-log-corner">
+        <div id="update-log-corner-header">
+          <span class="small-muted">Update Log</span>
+          <button id="open-update-full" class="btn-xs">View all</button>
+        </div>
+        <div id="update-log-corner-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN CHANGELOG -->
+<div id="update-log-fullscreen">
+  <div class="update-full-inner">
+    <div class="update-full-header">
+      <div>
+        <div class="card-title">Capital Tycoon – Changelog</div>
+        <div class="card-subtitle">All major updates, systems, and balance changes.</div>
+      </div>
+      <button id="close-update-full" class="btn btn-ghost">Close</button>
+    </div>
+
+    <div id="update-full-content">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
 <header>
-  <div class="brand">
+  <div class="brand-main">
     <div class="brand-logo">£</div>
     <div>
       <div class="brand-title">Capital Tycoon</div>
-      <div class="brand-sub">Web Wealth Simulator</div>
+      <div class="brand-sub">Business Empire Web Edition</div>
     </div>
   </div>
   <div class="auth-bar">
@@ -834,13 +1206,13 @@
   </div>
 </header>
 
-<main>
-  <!-- LEFT: GAME -->
+<main id="game-root" style="display:none;">
+  <!-- LEFT: PORTFOLIO + MARKETS -->
   <section class="card">
     <div class="card-header">
       <div>
-        <div class="card-title">Portfolio Overview</div>
-        <div class="card-subtitle">Build your empire across stocks, crypto, and businesses.</div>
+        <div class="card-title">Empire Overview</div>
+        <div class="card-subtitle">Tap, invest, build businesses, and manage risk.</div>
       </div>
       <div class="badge">
         <span class="badge-dot"></span>
@@ -854,7 +1226,7 @@
         <div class="stat-label">Cash</div>
         <div class="stat-value" id="stat-cash">£0</div>
         <div class="stat-chip neutral">
-          <span>Liquid</span>
+          <span>Liquid funds</span>
         </div>
       </div>
       <div class="stat">
@@ -883,9 +1255,7 @@
       </div>
     </div>
 
-    <div class="ticker" id="ticker">
-      <!-- dynamic market summary -->
-    </div>
+    <div class="ticker" id="ticker"></div>
 
     <div class="panel">
       <div class="panel-title">Markets</div>
@@ -908,11 +1278,9 @@
 
     <div class="panel">
       <div class="panel-title">Upgrades & Automation</div>
-      <div class="upgrades-grid" id="upgrades-grid">
-        <!-- dynamic upgrades -->
-      </div>
+      <div class="upgrades-grid" id="upgrades-grid"></div>
       <div class="small-muted" style="margin-top:6px;">
-        Upgrades permanently improve your earning power, volatility resistance, or unlock new mechanics.
+        Upgrades permanently improve income, volatility resistance, automation, and prestige scaling.
       </div>
     </div>
 
@@ -922,72 +1290,77 @@
     </div>
   </section>
 
-  <!-- RIGHT: AUTH + LEADERBOARD -->
+  <!-- RIGHT: TAP, MISSIONS, CITY, LEADERBOARD -->
   <section>
-    <div class="login-layout">
-      <div class="login-hero">
-        <div class="login-hero-title">Compete for the Global Rich List.</div>
-        <div class="login-hero-sub">
-          Sign in to save your progress, sync across devices, and climb the Supabase‑powered leaderboard.
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Tap‑to‑Earn & Empire Systems</div>
+          <div class="card-subtitle">Manual income, managers, prestige, and city expansion.</div>
         </div>
-        <div class="login-pills">
-          <div class="login-pill">Real‑time Supabase auth</div>
-          <div class="login-pill">Persistent cloud saves</div>
-          <div class="login-pill">Global leaderboard</div>
-          <div class="login-pill">Random market events</div>
-          <div class="login-pill">Stocks · Crypto · Businesses</div>
-        </div>
-        <div class="login-metrics">
-          <div class="login-metric">
-            <div class="login-metric-label">Top Net Worth</div>
-            <div class="login-metric-value" id="metric-top-net">£0</div>
-          </div>
-          <div class="login-metric">
-            <div class="login-metric-label">Active Tycoons</div>
-            <div class="login-metric-value" id="metric-players">0</div>
-          </div>
-          <div class="login-metric">
-            <div class="login-metric-label">Your Rank</div>
-            <div class="login-metric-value" id="metric-rank">–</div>
-          </div>
+        <div class="prestige-pill" id="prestige-pill">
+          Prestige x<span id="prestige-mult">1.0</span>
         </div>
       </div>
 
-      <div class="login-form-card">
-        <div class="card-header" style="margin-bottom:8px;">
-          <div>
-            <div class="card-title" id="auth-mode-label">Sign In</div>
-            <div class="card-subtitle">Use email + password. No spam, no nonsense.</div>
-          </div>
-        </div>
-        <div class="form-row">
-          <label class="form-label" for="auth-email">Email</label>
-          <input id="auth-email" class="input" type="email" placeholder="you@example.com" />
-        </div>
-        <div class="form-row">
-          <label class="form-label" for="auth-password">Password</label>
-          <input id="auth-password" class="input" type="password" placeholder="••••••••" />
-          <div class="form-help">Minimum 6 characters. This is handled by Supabase auth.</div>
-        </div>
-        <div class="form-row">
-          <label class="form-label" for="auth-username">Username (for leaderboard)</label>
-          <input id="auth-username" class="input" type="text" placeholder="Tycoon name" />
-          <div class="form-help">Shown on the global leaderboard. You can change it later.</div>
-        </div>
-        <div class="form-actions">
-          <button id="auth-submit" class="btn btn-primary">
-            <span id="auth-submit-label">Sign In</span>
+      <div class="tap-panel">
+        <div class="tap-card">
+          <div class="panel-title">Tap‑to‑Earn</div>
+          <button id="tap-earn-btn" class="tap-main-btn">
+            <span>Tap to Earn</span>
+            <span id="tap-earn-amount">+£10</span>
           </button>
-          <div>
-            <div class="small-muted">No account?</div>
-            <div class="toggle-auth" id="toggle-auth">Switch to Sign Up</div>
+          <div class="tap-meta-row">
+            <span>Tap Level: <span id="tap-level">1</span></span>
+            <span>Next upgrade: <span id="tap-upgrade-cost">£500</span></span>
+          </div>
+          <div class="tap-meta-row" style="margin-top:4px;">
+            <button id="tap-upgrade-btn" class="btn-xs primary">Upgrade Tap</button>
+            <span class="small-muted">Tap power scales with prestige.</span>
           </div>
         </div>
-        <div id="auth-message"></div>
+
+        <div class="tap-card">
+          <div class="panel-title">Managers & Automation</div>
+          <div class="small-muted" style="margin-bottom:4px;">
+            Hire managers to auto‑tap and boost business income.
+          </div>
+          <div class="missions-list" id="managers-list"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">City Map</div>
+        <div class="city-grid" id="city-grid"></div>
+        <div class="small-muted" style="margin-top:4px;">
+          Unlock new districts to access higher‑tier businesses and better missions.
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Missions & Goals</div>
+        <div class="missions-list" id="missions-list"></div>
+        <div class="small-muted" style="margin-top:4px;">
+          Complete missions for cash, boosts, and prestige shards.
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Prestige Reset</div>
+        <div class="small-muted">
+          Reset your empire once you reach a high enough net worth to gain a permanent prestige multiplier.
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <div class="small-muted">
+            Requirement: <span id="prestige-requirement">£5M</span> net worth.  
+            Current best: <span id="prestige-current-best">£0</span>
+          </div>
+          <button id="prestige-btn" class="btn-xs danger">Prestige Reset</button>
+        </div>
       </div>
     </div>
 
-    <div class="card" style="margin-top:16px;">
+    <div class="card" style="margin-top:14px;">
       <div class="card-header">
         <div>
           <div class="card-title">Global Leaderboard</div>
@@ -1025,7 +1398,7 @@
     cash: 1000,
     netWorth: 1000,
     passiveIncomePerTick: 0,
-    riskScore: 0.5, // 0 = ultra safe, 1 = ultra degen
+    riskScore: 0.5,
     assets: {
       stocks: {},
       crypto: {},
@@ -1033,10 +1406,18 @@
     },
     upgrades: {},
     lastEvents: [],
-    bestNetWorth: 1000
+    bestNetWorth: 1000,
+    tapLevel: 1,
+    tapBase: 10,
+    managers: {},
+    cities: {},
+    missions: {},
+    prestigeLevel: 0,
+    prestigeMultiplier: 1.0,
+    lastLogoutAt: null
   };
 
-  // Asset definitions
+  // Asset definitions (expanded)
   const STOCKS = [
     { id: "FTSE_BLUE", name: "FTSE BlueChip ETF", type: "stocks", basePrice: 120, volatility: 0.03, incomeYield: 0.01, tagline: "Broad UK exposure, low volatility.", tags: ["Defensive", "Dividend"], sector: "Index" },
     { id: "UK_TECH", name: "Albion Cloud Systems", type: "stocks", basePrice: 80, volatility: 0.07, incomeYield: 0.0, tagline: "High‑growth UK SaaS darling.", tags: ["Growth", "Tech"], sector: "Technology" },
@@ -1044,7 +1425,8 @@
     { id: "LUXURY_BRANDS", name: "Crown & Velvet Group", type: "stocks", basePrice: 210, volatility: 0.06, incomeYield: 0.012, tagline: "Luxury goods, resilient margins.", tags: ["Luxury", "Consumer"], sector: "Consumer" },
     { id: "BANKING_UK", name: "Royal Thames Bank", type: "stocks", basePrice: 95, volatility: 0.04, incomeYield: 0.02, tagline: "Dividends with rate sensitivity.", tags: ["Dividend", "Finance"], sector: "Finance" },
     { id: "HEALTHCARE_GLOBAL", name: "Global Health Innovators", type: "stocks", basePrice: 130, volatility: 0.045, incomeYield: 0.008, tagline: "Pharma & med‑tech R&D.", tags: ["Defensive", "Health"], sector: "Healthcare" },
-    { id: "EMERGING_MKTS", name: "Emerging Horizons ETF", type: "stocks", basePrice: 70, volatility: 0.09, incomeYield: 0.0, tagline: "High risk, high potential.", tags: ["Emerging", "Volatile"], sector: "Index" }
+    { id: "EMERGING_MKTS", name: "Emerging Horizons ETF", type: "stocks", basePrice: 70, volatility: 0.09, incomeYield: 0.0, tagline: "High risk, high potential.", tags: ["Emerging", "Volatile"], sector: "Index" },
+    { id: "UK_RETAIL", name: "High Street Retail Group", type: "stocks", basePrice: 60, volatility: 0.06, incomeYield: 0.01, tagline: "Consumer‑driven, cyclical.", tags: ["Retail"], sector: "Consumer" }
   ];
 
   const CRYPTO = [
@@ -1052,25 +1434,85 @@
     { id: "ETH", name: "Ethereum", type: "crypto", basePrice: 2000, volatility: 0.11, incomeYield: 0.0, tagline: "Smart contract backbone.", tags: ["Smart contracts", "Growth"] },
     { id: "STABLE_GBP", name: "Sterling Stablecoin", type: "crypto", basePrice: 1, volatility: 0.001, incomeYield: 0.0, tagline: "Pegged to GBP, low risk.", tags: ["Stable", "Low risk"] },
     { id: "DEFI_YIELD", name: "DeFi Yield Index", type: "crypto", basePrice: 150, volatility: 0.16, incomeYield: 0.02, tagline: "High yield, protocol risk.", tags: ["Yield", "DeFi"] },
-    { id: "MEME_COIN", name: "CorgiCoin", type: "crypto", basePrice: 0.02, volatility: 0.25, incomeYield: 0.0, tagline: "Pure speculation, pure chaos.", tags: ["Meme", "Ultra‑volatile"] }
+    { id: "MEME_COIN", name: "CorgiCoin", type: "crypto", basePrice: 0.02, volatility: 0.25, incomeYield: 0.0, tagline: "Pure speculation, pure chaos.", tags: ["Meme", "Ultra‑volatile"] },
+    { id: "LAYER2", name: "Layer‑2 Rollup Token", type: "crypto", basePrice: 4, volatility: 0.14, incomeYield: 0.0, tagline: "Scaling infrastructure bet.", tags: ["Infra", "Growth"] }
   ];
 
   const BUSINESSES = [
-    { id: "COFFEE_CHAIN", name: "High Street Coffee Co.", type: "businesses", basePrice: 5000, volatility: 0.03, incomeYield: 0.06, tagline: "Franchise coffee shops across the UK.", tags: ["Brick & mortar", "Cashflow"], baseIncome: 120 },
-    { id: "SAAS_TOOL", name: "Subscriptly CRM", type: "businesses", basePrice: 8000, volatility: 0.05, incomeYield: 0.09, tagline: "B2B subscription CRM platform.", tags: ["SaaS", "Recurring"], baseIncome: 220 },
-    { id: "RENTAL_UNITS", name: "Urban Flats Portfolio", type: "businesses", basePrice: 12000, volatility: 0.04, incomeYield: 0.07, tagline: "Residential rentals in major cities.", tags: ["Property", "Yield"], baseIncome: 320 },
-    { id: "E_COMMERCE", name: "Midnight Market", type: "businesses", basePrice: 6000, volatility: 0.06, incomeYield: 0.08, tagline: "Niche e‑commerce marketplace.", tags: ["Online", "Scalable"], baseIncome: 180 },
-    { id: "AI_AGENCY", name: "Prompt & Co. AI Studio", type: "businesses", basePrice: 10000, volatility: 0.08, incomeYield: 0.1, tagline: "AI consulting & automation.", tags: ["AI", "High margin"], baseIncome: 260 }
+    { id: "COFFEE_CHAIN", name: "High Street Coffee Co.", type: "businesses", basePrice: 5000, volatility: 0.03, incomeYield: 0.06, tagline: "Franchise coffee shops across the UK.", tags: ["Brick & mortar", "Cashflow"], baseIncome: 120, tier: 1 },
+    { id: "SAAS_TOOL", name: "Subscriptly CRM", type: "businesses", basePrice: 8000, volatility: 0.05, incomeYield: 0.09, tagline: "B2B subscription CRM platform.", tags: ["SaaS", "Recurring"], baseIncome: 220, tier: 2 },
+    { id: "RENTAL_UNITS", name: "Urban Flats Portfolio", type: "businesses", basePrice: 12000, volatility: 0.04, incomeYield: 0.07, tagline: "Residential rentals in major cities.", tags: ["Property", "Yield"], baseIncome: 320, tier: 2 },
+    { id: "E_COMMERCE", name: "Midnight Market", type: "businesses", basePrice: 6000, volatility: 0.06, incomeYield: 0.08, tagline: "Niche e‑commerce marketplace.", tags: ["Online", "Scalable"], baseIncome: 180, tier: 1 },
+    { id: "AI_AGENCY", name: "Prompt & Co. AI Studio", type: "businesses", basePrice: 10000, volatility: 0.08, incomeYield: 0.1, tagline: "AI consulting & automation.", tags: ["AI", "High margin"], baseIncome: 260, tier: 3 },
+    { id: "MEGA_MALL", name: "Empire Mega Mall", type: "businesses", basePrice: 25000, volatility: 0.05, incomeYield: 0.09, tagline: "Flagship retail destination.", tags: ["Mega", "Property"], baseIncome: 600, tier: 3 }
   ];
 
   const ALL_ASSETS = [...STOCKS, ...CRYPTO, ...BUSINESSES];
 
+  // Managers (auto tap / auto income)
+  const MANAGERS = [
+    { id: "TAP_ASSISTANT", name: "Tap Assistant", description: "Automatically taps once per tick.", cost: 3000, type: "tap", power: 1 },
+    { id: "TAP_DIRECTOR", name: "Tap Director", description: "Adds 3 auto‑taps per tick.", cost: 9000, type: "tap", power: 3 },
+    { id: "BIZ_MANAGER", name: "Business Manager", description: "Boosts all business income by 10%.", cost: 12000, type: "business_boost", power: 0.1 },
+    { id: "CRYPTO_QUANT", name: "Crypto Quant", description: "Small chance each tick to generate bonus crypto profit.", cost: 15000, type: "crypto_bonus", power: 1 }
+  ];
+
+  // Cities
+  const CITIES = [
+    { id: "CITY_START", name: "Local Borough", description: "Where every empire begins.", unlockCost: 0 },
+    { id: "CITY_METRO", name: "Metro City", description: "Bigger deals, bigger risks.", unlockCost: 20000 },
+    { id: "CITY_GLOBAL", name: "Global Capital", description: "Top‑tier opportunities and mega deals.", unlockCost: 100000 }
+  ];
+
+  // Missions
+  const MISSIONS = [
+    { id: "M1_FIRST_STOCK", title: "First Stock Purchase", description: "Buy any stock.", rewardCash: 500, rewardPrestige: 0.05 },
+    { id: "M2_FIRST_BIZ", title: "Own a Business", description: "Buy any business.", rewardCash: 1500, rewardPrestige: 0.1 },
+    { id: "M3_CRYPTO_DABBLE", title: "Crypto Dabbler", description: "Buy any crypto asset.", rewardCash: 800, rewardPrestige: 0.05 },
+    { id: "M4_TAP_MASTER", title: "Tap Master", description: "Reach tap level 5.", rewardCash: 3000, rewardPrestige: 0.15 },
+    { id: "M5_CITY_EXPAND", title: "City Expansion", description: "Unlock Metro City.", rewardCash: 5000, rewardPrestige: 0.2 }
+  ];
+
+  // Upgrades (expanded)
   const UPGRADES = [
     { id: "RISK_ANALYTICS", name: "Risk Analytics Suite", description: "Reduce downside volatility across all assets by ~10%.", cost: 4000, effect: { volatilityMultiplier: 0.9 } },
     { id: "TAX_OPTIMISATION", name: "Tax Optimisation", description: "Reduce negative impact of tax events by 30%.", cost: 6000, effect: { taxHitMultiplier: 0.7 } },
     { id: "AUTO_REINVEST", name: "Auto‑Reinvest Engine", description: "Automatically reinvest 20% of passive income into your best asset.", cost: 7000, effect: { autoReinvest: true } },
-    { id: "DIVERSIFICATION", name: "Diversification Playbook", description: "Slightly boosts net worth growth when holding all three classes.", cost: 5000, effect: { diversificationBonus: true } },
-    { id: "ALGO_TRADER", name: "Algo Trader Bot", description: "Small chance each tick to generate bonus trading profit.", cost: 9000, effect: { algoTrader: true } }
+    { id: "DIVERSIFICATION", name: "Diversification Playbook", description: "Boosts net worth growth when holding all three classes.", cost: 5000, effect: { diversificationBonus: true } },
+    { id: "ALGO_TRADER", name: "Algo Trader Bot", description: "Chance each tick to generate bonus trading profit.", cost: 9000, effect: { algoTrader: true } },
+    { id: "PRESTIGE_BOOST", name: "Prestige Consultant", description: "Prestige multiplier gains are 20% stronger.", cost: 20000, effect: { prestigeBoost: 1.2 } }
+  ];
+
+  // Update log data
+  const UPDATE_LOG = [
+    {
+      version: "v0.3.0",
+      date: "2026‑04‑29",
+      highlights: [
+        "Added full tap‑to‑earn system with upgrades.",
+        "Introduced managers for auto‑taps and business boosts.",
+        "Implemented prestige reset with permanent multiplier.",
+        "Added city expansion map with three districts.",
+        "Expanded missions system with cash and prestige rewards."
+      ]
+    },
+    {
+      version: "v0.2.0",
+      date: "2026‑04‑28",
+      highlights: [
+        "Stocks, crypto, and business markets with volatility and income.",
+        "Supabase‑backed auth, profiles, and leaderboard.",
+        "Random events: booms, crashes, tax bills, and windfalls.",
+        "Basic upgrades for risk, tax, and auto‑reinvest."
+      ]
+    },
+    {
+      version: "v0.1.0",
+      date: "2026‑04‑27",
+      highlights: [
+        "Initial prototype with cash, net worth, and simple tick system."
+      ]
+    }
   ];
 
   // Runtime modifiers from upgrades
@@ -1079,7 +1521,8 @@
     taxHitMultiplier: 1,
     autoReinvest: false,
     diversificationBonus: false,
-    algoTrader: false
+    algoTrader: false,
+    prestigeBoost: 1
   };
 
   // =========================
@@ -1098,7 +1541,6 @@
   }
 
   function randomNormal() {
-    // Box-Muller
     let u = 0, v = 0;
     while (u === 0) u = Math.random();
     while (v === 0) v = Math.random();
@@ -1107,7 +1549,7 @@
 
   function addEvent(message, type = "neutral") {
     gameState.lastEvents.unshift({ message, type, tick: tickCount });
-    if (gameState.lastEvents.length > 20) gameState.lastEvents.pop();
+    if (gameState.lastEvents.length > 30) gameState.lastEvents.pop();
     renderEvents();
   }
 
@@ -1121,7 +1563,10 @@
         quantity: 0,
         price: asset.basePrice,
         lastChange: 0,
-        incomePerTick: asset.type === "businesses" ? (asset.baseIncome || 0) : asset.basePrice * asset.incomeYield
+        level: 1,
+        incomePerTick: asset.type === "businesses"
+          ? (asset.baseIncome || 0)
+          : asset.basePrice * asset.incomeYield
       };
     }
     return bucket[asset.id];
@@ -1133,12 +1578,16 @@
     for (const asset of ALL_ASSETS) {
       const state = ensureAssetState(asset);
       if (state.quantity > 0 && state.incomePerTick > 0) {
-        total += state.incomePerTick * state.quantity;
+        let income = state.incomePerTick * state.quantity;
+        if (asset.type === "businesses" && gameState.managers["BIZ_MANAGER"]) {
+          income *= 1 + MANAGERS.find(m => m.id === "BIZ_MANAGER").power;
+        }
+        total += income;
         sources++;
       }
     }
-    gameState.passiveIncomePerTick = total;
-    return { total, sources };
+    gameState.passiveIncomePerTick = total * gameState.prestigeMultiplier;
+    return { total: gameState.passiveIncomePerTick, sources };
   }
 
   function computeNetWorth() {
@@ -1196,6 +1645,7 @@
     modifiers.autoReinvest = false;
     modifiers.diversificationBonus = false;
     modifiers.algoTrader = false;
+    modifiers.prestigeBoost = 1;
 
     for (const up of UPGRADES) {
       if (gameState.upgrades[up.id]) {
@@ -1213,6 +1663,9 @@
         }
         if (up.effect.algoTrader) {
           modifiers.algoTrader = true;
+        }
+        if (up.effect.prestigeBoost) {
+          modifiers.prestigeBoost *= up.effect.prestigeBoost;
         }
       }
     }
@@ -1241,10 +1694,14 @@
       addEvent("You earned " + fmtMoney(income) + " in passive income.", "positive");
     }
 
-    // Auto reinvest
-    if (modifiers.autoReinvest && income > 0) {
-      const reinvestAmount = income * 0.2;
-      autoReinvest(reinvestAmount);
+    // Auto tap from managers
+    const tapAutoPower = (gameState.managers["TAP_ASSISTANT"] ? MANAGERS.find(m => m.id === "TAP_ASSISTANT").power : 0)
+      + (gameState.managers["TAP_DIRECTOR"] ? MANAGERS.find(m => m.id === "TAP_DIRECTOR").power : 0);
+    if (tapAutoPower > 0) {
+      const perTap = getTapIncome();
+      const autoIncome = perTap * tapAutoPower;
+      gameState.cash += autoIncome;
+      addEvent("Managers auto‑tapped for " + fmtMoney(autoIncome) + ".", "positive");
     }
 
     // Random events
@@ -1256,7 +1713,7 @@
       const hasCrypto = Object.values(gameState.assets.crypto).some(a => a.quantity > 0);
       const hasBiz = Object.values(gameState.assets.businesses).some(a => a.quantity > 0);
       if (hasStocks && hasCrypto && hasBiz) {
-        const bonus = gameState.netWorth * 0.002;
+        const bonus = gameState.netWorth * 0.002 * gameState.prestigeMultiplier;
         gameState.cash += bonus;
         addEvent("Diversification bonus: " + fmtMoney(bonus) + " added to cash.", "positive");
       }
@@ -1264,9 +1721,16 @@
 
     // Algo trader
     if (modifiers.algoTrader && Math.random() < 0.18) {
-      const profit = 200 + Math.random() * 600;
+      const profit = (200 + Math.random() * 600) * gameState.prestigeMultiplier;
       gameState.cash += profit;
       addEvent("Algo Trader executed a profitable trade: +" + fmtMoney(profit), "positive");
+    }
+
+    // Crypto quant manager
+    if (gameState.managers["CRYPTO_QUANT"] && Math.random() < 0.18) {
+      const profit = (300 + Math.random() * 900) * gameState.prestigeMultiplier;
+      gameState.cash += profit;
+      addEvent("Crypto Quant captured a DeFi arb: +" + fmtMoney(profit), "positive");
     }
 
     // Recompute net worth & risk
@@ -1277,6 +1741,7 @@
     renderStats(net, risk);
     renderMarket();
     renderTicker();
+    renderMissions();
 
     // Periodically sync to Supabase
     if (currentUser) {
@@ -1288,7 +1753,6 @@
   }
 
   function autoReinvest(amount) {
-    // Find best asset by lastChange or income
     let bestAsset = null;
     let bestScore = -Infinity;
     for (const asset of ALL_ASSETS) {
@@ -1311,8 +1775,7 @@
 
   function randomEvents() {
     const roll = Math.random();
-    if (roll < 0.08) {
-      // Market boom
+    if (roll < 0.06) {
       const factor = 1.1 + Math.random() * 0.15;
       for (const asset of ALL_ASSETS) {
         const state = ensureAssetState(asset);
@@ -1322,8 +1785,7 @@
         }
       }
       addEvent("Equity markets rally! Stocks jump " + fmtPercent(factor - 1) + ".", "positive");
-    } else if (roll < 0.14) {
-      // Crypto crash
+    } else if (roll < 0.11) {
       const factor = 0.7 + Math.random() * 0.15;
       for (const asset of ALL_ASSETS) {
         const state = ensureAssetState(asset);
@@ -1333,16 +1795,20 @@
         }
       }
       addEvent("Crypto crash! Risk assets fall " + fmtPercent(factor - 1) + ".", "negative");
-    } else if (roll < 0.18) {
-      // Tax event
+    } else if (roll < 0.15) {
       const hit = gameState.cash * 0.12 * modifiers.taxHitMultiplier;
       gameState.cash -= hit;
       addEvent("Tax bill due: " + fmtMoney(hit) + " paid.", "negative");
-    } else if (roll < 0.22) {
-      // Windfall
-      const bonus = 500 + Math.random() * 1500;
+    } else if (roll < 0.19) {
+      const bonus = (500 + Math.random() * 1500) * gameState.prestigeMultiplier;
       gameState.cash += bonus;
       addEvent("Unexpected windfall: " + fmtMoney(bonus) + " credited.", "positive");
+    } else if (roll < 0.22) {
+      const bonus = (gameState.passiveIncomePerTick || 0) * (2 + Math.random() * 3);
+      if (bonus > 0) {
+        gameState.cash += bonus;
+        addEvent("Business boom week: bonus income " + fmtMoney(bonus) + ".", "positive");
+      }
     }
   }
 
@@ -1363,6 +1829,7 @@
     computeRiskProfile();
     renderStats(gameState.netWorth, gameState.riskScore);
     renderMarket();
+    checkMissionsProgress();
   }
 
   function sellAsset(assetId, type, qty) {
@@ -1404,6 +1871,171 @@
     renderUpgrades();
   }
 
+  function getTapIncome() {
+    return gameState.tapBase * gameState.tapLevel * gameState.prestigeMultiplier;
+  }
+
+  function tapEarn() {
+    const amount = getTapIncome();
+    gameState.cash += amount;
+    addEvent("Manual tap earned " + fmtMoney(amount) + ".", "positive");
+    computeNetWorth();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    checkMissionsProgress();
+  }
+
+  function upgradeTap() {
+    const nextLevel = gameState.tapLevel + 1;
+    const cost = 500 * Math.pow(1.6, gameState.tapLevel - 1);
+    if (gameState.cash < cost) {
+      addEvent("Not enough cash to upgrade tap.", "negative");
+      return;
+    }
+    gameState.cash -= cost;
+    gameState.tapLevel = nextLevel;
+    addEvent("Tap upgraded to level " + nextLevel + ".", "positive");
+    computeNetWorth();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderTap();
+    checkMissionsProgress();
+  }
+
+  function buyManager(managerId) {
+    const m = MANAGERS.find(x => x.id === managerId);
+    if (!m) return;
+    if (gameState.managers[managerId]) {
+      addEvent(m.name + " already hired.", "negative");
+      return;
+    }
+    if (gameState.cash < m.cost) {
+      addEvent("Not enough cash to hire " + m.name + ".", "negative");
+      return;
+    }
+    gameState.cash -= m.cost;
+    gameState.managers[managerId] = true;
+    addEvent("Manager hired: " + m.name + ".", "positive");
+    computeNetWorth();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderManagers();
+  }
+
+  function unlockCity(cityId) {
+    const c = CITIES.find(x => x.id === cityId);
+    if (!c) return;
+    if (gameState.cities[cityId]) return;
+    if (gameState.cash < c.unlockCost) {
+      addEvent("Not enough cash to unlock " + c.name + ".", "negative");
+      return;
+    }
+    gameState.cash -= c.unlockCost;
+    gameState.cities[cityId] = true;
+    addEvent("City unlocked: " + c.name + ".", "positive");
+    computeNetWorth();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderCities();
+    checkMissionsProgress();
+  }
+
+  function checkMissionsProgress() {
+    for (const mission of MISSIONS) {
+      const state = gameState.missions[mission.id] || { status: "locked", progress: 0 };
+      if (state.status === "done") continue;
+
+      let completed = false;
+
+      if (mission.id === "M1_FIRST_STOCK") {
+        const anyStock = Object.values(gameState.assets.stocks).some(a => a.quantity > 0);
+        if (anyStock) completed = true;
+      } else if (mission.id === "M2_FIRST_BIZ") {
+        const anyBiz = Object.values(gameState.assets.businesses).some(a => a.quantity > 0);
+        if (anyBiz) completed = true;
+      } else if (mission.id === "M3_CRYPTO_DABBLE") {
+        const anyCrypto = Object.values(gameState.assets.crypto).some(a => a.quantity > 0);
+        if (anyCrypto) completed = true;
+      } else if (mission.id === "M4_TAP_MASTER") {
+        if (gameState.tapLevel >= 5) completed = true;
+      } else if (mission.id === "M5_CITY_EXPAND") {
+        if (gameState.cities["CITY_METRO"]) completed = true;
+      }
+
+      if (completed) {
+        completeMission(mission.id);
+      } else {
+        if (state.status === "locked") {
+          state.status = "active";
+        }
+        gameState.missions[mission.id] = state;
+      }
+    }
+    renderMissions();
+  }
+
+  function completeMission(missionId) {
+    const mission = MISSIONS.find(m => m.id === missionId);
+    if (!mission) return;
+    const state = gameState.missions[missionId] || { status: "locked", progress: 0 };
+    if (state.status === "done") return;
+
+    state.status = "done";
+    gameState.missions[missionId] = state;
+
+    gameState.cash += mission.rewardCash;
+    const prestigeGain = mission.rewardPrestige * modifiers.prestigeBoost;
+    gameState.prestigeMultiplier += prestigeGain;
+    addEvent("Mission completed: " + mission.title + ". Reward " + fmtMoney(mission.rewardCash) + " and prestige +" + prestigeGain.toFixed(2) + ".", "positive");
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderTap();
+    renderPrestige();
+  }
+
+  function prestigeReset() {
+    const requirement = 5_000_000;
+    if (gameState.bestNetWorth < requirement) {
+      addEvent("You need at least " + fmtMoney(requirement) + " best net worth to prestige.", "negative");
+      return;
+    }
+    const baseGain = 0.5 + (gameState.bestNetWorth / requirement - 1) * 0.25;
+    const gain = Math.max(0.5, baseGain) * modifiers.prestigeBoost;
+    gameState.prestigeLevel += 1;
+    gameState.prestigeMultiplier += gain;
+
+    gameState.cash = 1000;
+    gameState.netWorth = 1000;
+    gameState.assets = { stocks: {}, crypto: {}, businesses: {} };
+    gameState.upgrades = {};
+    gameState.lastEvents = [];
+    gameState.tapLevel = 1;
+    gameState.managers = {};
+    gameState.cities = { CITY_START: true };
+    gameState.missions = {};
+    gameState.bestNetWorth = 1000;
+
+    applyUpgradesEffects();
+    recalcPassiveIncome();
+    computeNetWorth();
+    computeRiskProfile();
+    renderAll();
+    addEvent("Prestige reset! New prestige multiplier +" + gain.toFixed(2) + " (total x" + gameState.prestigeMultiplier.toFixed(2) + ").", "positive");
+  }
+
+  function applyOfflineEarnings() {
+    if (!gameState.lastLogoutAt) return;
+    const last = new Date(gameState.lastLogoutAt).getTime();
+    const now = Date.now();
+    const diffMs = now - last;
+    if (diffMs <= 0) return;
+    const ticks = Math.min(3600, Math.floor(diffMs / TICK_INTERVAL_MS)); // cap offline ticks
+    if (ticks <= 0) return;
+
+    const { total } = recalcPassiveIncome();
+    const offlineIncome = total * ticks * 0.5; // 50% efficiency offline
+    if (offlineIncome > 0) {
+      gameState.cash += offlineIncome;
+      addEvent("Offline earnings: " + fmtMoney(offlineIncome) + " collected while you were away (" + ticks + " ticks).", "positive");
+      computeNetWorth();
+    }
+  }
+
   // =========================
   // Rendering
   // =========================
@@ -1440,13 +2072,14 @@
     document.getElementById("stat-risk").textContent = riskLabel;
     document.getElementById("stat-risk-desc").textContent = riskDesc;
 
-    // Tab counts
     const stocksOwned = Object.values(gameState.assets.stocks).reduce((s, a) => s + (a.quantity || 0), 0);
     const cryptoOwned = Object.values(gameState.assets.crypto).reduce((s, a) => s + (a.quantity || 0), 0);
     const bizOwned = Object.values(gameState.assets.businesses).reduce((s, a) => s + (a.quantity || 0), 0);
     document.getElementById("tab-stocks-count").textContent = stocksOwned + " owned";
     document.getElementById("tab-crypto-count").textContent = cryptoOwned + " owned";
     document.getElementById("tab-businesses-count").textContent = bizOwned + " owned";
+
+    document.getElementById("prestige-current-best").textContent = fmtMoney(gameState.bestNetWorth);
   }
 
   function renderMarket() {
@@ -1481,7 +2114,7 @@
         const incomePill = document.createElement("span");
         incomePill.className = "asset-pill green";
         if (asset.baseIncome) {
-          incomePill.textContent = "Income: " + fmtMoney(asset.baseIncome) + "/tick";
+          incomePill.textContent = "Income: " + fmtMoney(asset.baseIncome * state.level) + "/tick";
         } else {
           incomePill.textContent = "Yield: " + fmtPercent(asset.incomeYield);
         }
@@ -1492,6 +2125,13 @@
       volPill.className = "asset-pill purple";
       volPill.textContent = "Vol: " + (asset.volatility * 100).toFixed(1) + "%";
       meta.appendChild(volPill);
+
+      if (asset.tier) {
+        const tierPill = document.createElement("span");
+        tierPill.className = "asset-pill yellow";
+        tierPill.textContent = "Tier " + asset.tier;
+        meta.appendChild(tierPill);
+      }
 
       for (const tag of asset.tags || []) {
         const tagPill = document.createElement("span");
@@ -1659,6 +2299,216 @@
     return sum / list.length;
   }
 
+  function renderTap() {
+    document.getElementById("tap-level").textContent = gameState.tapLevel;
+    document.getElementById("tap-earn-amount").textContent = "+" + fmtMoney(getTapIncome());
+    const cost = 500 * Math.pow(1.6, gameState.tapLevel - 1);
+    document.getElementById("tap-upgrade-cost").textContent = fmtMoney(cost);
+  }
+
+  function renderManagers() {
+    const list = document.getElementById("managers-list");
+    list.innerHTML = "";
+    for (const m of MANAGERS) {
+      const row = document.createElement("div");
+      row.className = "mission-row";
+      const title = document.createElement("div");
+      title.className = "mission-title";
+      title.textContent = m.name;
+      const desc = document.createElement("div");
+      desc.className = "mission-desc";
+      desc.textContent = m.description;
+      const footer = document.createElement("div");
+      footer.className = "mission-footer";
+      const cost = document.createElement("div");
+      cost.className = "small-muted";
+      cost.textContent = "Cost: " + fmtMoney(m.cost);
+      const btn = document.createElement("button");
+      btn.className = "btn-xs primary";
+      btn.textContent = gameState.managers[m.id] ? "Hired" : "Hire";
+      btn.disabled = !!gameState.managers[m.id];
+      btn.onclick = () => buyManager(m.id);
+      footer.appendChild(cost);
+      footer.appendChild(btn);
+      row.appendChild(title);
+      row.appendChild(desc);
+      row.appendChild(footer);
+      list.appendChild(row);
+    }
+  }
+
+  function renderCities() {
+    const grid = document.getElementById("city-grid");
+    grid.innerHTML = "";
+    for (const c of CITIES) {
+      const tile = document.createElement("div");
+      tile.className = "city-tile";
+      if (gameState.cities[c.id]) tile.classList.add("unlocked");
+      const name = document.createElement("div");
+      name.className = "city-name";
+      name.textContent = c.name;
+      const desc = document.createElement("div");
+      desc.className = "city-desc";
+      desc.textContent = gameState.cities[c.id] ? "Unlocked" : "Unlock for " + fmtMoney(c.unlockCost);
+      tile.appendChild(name);
+      tile.appendChild(desc);
+      tile.onclick = () => {
+        if (!gameState.cities[c.id]) unlockCity(c.id);
+      };
+      grid.appendChild(tile);
+    }
+  }
+
+  function renderMissions() {
+    const list = document.getElementById("missions-list");
+    list.innerHTML = "";
+    for (const mission of MISSIONS) {
+      const state = gameState.missions[mission.id] || { status: "locked", progress: 0 };
+      const row = document.createElement("div");
+      row.className = "mission-row";
+      const title = document.createElement("div");
+      title.className = "mission-title";
+      title.textContent = mission.title;
+      const desc = document.createElement("div");
+      desc.className = "mission-desc";
+      desc.textContent = mission.description;
+      const footer = document.createElement("div");
+      footer.className = "mission-footer";
+      const reward = document.createElement("div");
+      reward.className = "small-muted";
+      reward.textContent = "Reward: " + fmtMoney(mission.rewardCash) + " + prestige " + mission.rewardPrestige.toFixed(2);
+      const status = document.createElement("div");
+      status.className = "mission-status";
+      if (state.status === "done") {
+        status.classList.add("done");
+        status.textContent = "Completed";
+      } else if (state.status === "active") {
+        status.classList.add("active");
+        status.textContent = "In progress";
+      } else {
+        status.textContent = "Locked";
+      }
+      footer.appendChild(reward);
+      footer.appendChild(status);
+      row.appendChild(title);
+      row.appendChild(desc);
+      row.appendChild(footer);
+      list.appendChild(row);
+    }
+  }
+
+  function renderPrestige() {
+    document.getElementById("prestige-mult").textContent = gameState.prestigeMultiplier.toFixed(2);
+    const requirement = 5_000_000;
+    document.getElementById("prestige-requirement").textContent = fmtMoney(requirement);
+    document.getElementById("prestige-current-best").textContent = fmtMoney(gameState.bestNetWorth);
+  }
+
+  function renderLeaderboard(data) {
+    const list = document.getElementById("leaderboard-list");
+    list.innerHTML = "";
+
+    let topNet = 0;
+    let players = data.length;
+    let myRank = "–";
+
+    data.forEach((row, index) => {
+      if (index === 0) topNet = row.best_net_worth;
+      if (currentUser && row.id === currentUser.id) {
+        myRank = "#" + (index + 1);
+      }
+
+      const rowEl = document.createElement("div");
+      rowEl.className = "leader-row rank-" + (index + 1);
+
+      const rank = document.createElement("div");
+      rank.className = "leader-rank";
+      rank.textContent = "#" + (index + 1);
+
+      const name = document.createElement("div");
+      name.className = "leader-name";
+      name.textContent = row.username || "Anonymous";
+
+      const net = document.createElement("div");
+      net.className = "leader-net";
+      net.textContent = fmtMoney(row.best_net_worth || 0);
+
+      const updated = document.createElement("div");
+      updated.className = "leader-updated";
+      updated.textContent = row.updated_at ? new Date(row.updated_at).toLocaleString() : "";
+
+      rowEl.appendChild(rank);
+      rowEl.appendChild(name);
+      rowEl.appendChild(net);
+      rowEl.appendChild(updated);
+
+      list.appendChild(rowEl);
+    });
+
+    document.getElementById("metric-top-net-login").textContent = fmtMoney(topNet || 0);
+    document.getElementById("metric-players-login").textContent = players;
+    document.getElementById("metric-prestige-login").textContent = "x" + gameState.prestigeMultiplier.toFixed(1);
+  }
+
+  function renderUpdateLogCorner() {
+    const list = document.getElementById("update-log-corner-list");
+    list.innerHTML = "";
+    const latest = UPDATE_LOG[0];
+    latest.highlights.slice(0, 4).forEach(h => {
+      const line = document.createElement("div");
+      line.className = "update-line";
+      line.innerHTML = "<strong>" + latest.version + ":</strong> " + h;
+      list.appendChild(line);
+    });
+  }
+
+  function renderUpdateLogFull() {
+    const container = document.getElementById("update-full-content");
+    container.innerHTML = "";
+    for (const entry of UPDATE_LOG) {
+      const version = document.createElement("div");
+      version.className = "update-version";
+      version.textContent = entry.version;
+      const date = document.createElement("div");
+      date.className = "update-date";
+      date.textContent = entry.date;
+      container.appendChild(version);
+      container.appendChild(date);
+
+      const title = document.createElement("div");
+      title.className = "update-section-title";
+      title.textContent = "Highlights";
+      container.appendChild(title);
+
+      for (const h of entry.highlights) {
+        const bullet = document.createElement("div");
+        bullet.className = "update-bullet";
+        bullet.textContent = "• " + h;
+        container.appendChild(bullet);
+      }
+
+      const spacer = document.createElement("div");
+      spacer.style.height = "8px";
+      container.appendChild(spacer);
+    }
+  }
+
+  function renderAll() {
+    recalcPassiveIncome();
+    computeNetWorth();
+    computeRiskProfile();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderMarket();
+    renderUpgrades();
+    renderEvents();
+    renderTicker();
+    renderTap();
+    renderManagers();
+    renderCities();
+    renderMissions();
+    renderPrestige();
+  }
+
   // =========================
   // Auth & Supabase Persistence
   // =========================
@@ -1669,11 +2519,16 @@
     const { data } = await supabaseClient.auth.getSession();
     if (data.session) {
       currentUser = data.session.user;
-      updateSessionUI(true);
       await loadGameState();
       await loadLeaderboard();
+      updateSessionUI(true);
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("game-root").style.display = "grid";
     } else {
       updateSessionUI(false);
+      document.getElementById("login-screen").style.display = "flex";
+      document.getElementById("game-root").style.display = "none";
+      await loadLeaderboard(); // for login metrics
     }
   }
 
@@ -1702,6 +2557,8 @@
     await loadGameState();
     await loadLeaderboard();
     updateSessionUI(true);
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("game-root").style.display = "grid";
   }
 
   async function signUp(email, password, username) {
@@ -1718,15 +2575,20 @@
     await saveGameState(true);
     await submitLeaderboard();
     updateSessionUI(true);
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("game-root").style.display = "grid";
   }
 
   async function signOut() {
+    gameState.lastLogoutAt = new Date().toISOString();
     await saveGameState();
     await submitLeaderboard();
     await supabaseClient.auth.signOut();
     currentUser = null;
     currentProfileUsername = "";
     updateSessionUI(false);
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("game-root").style.display = "none";
   }
 
   async function loadGameState() {
@@ -1743,8 +2605,8 @@
     }
 
     if (!data) {
-      // create default profile
       currentProfileUsername = currentUser.user_metadata?.username || currentUser.email;
+      gameState.cities = { CITY_START: true };
       await saveGameState(true);
       return;
     }
@@ -1761,15 +2623,24 @@
       gameState.upgrades = saved.upgrades ?? gameState.upgrades;
       gameState.lastEvents = saved.lastEvents ?? [];
       gameState.bestNetWorth = saved.bestNetWorth ?? gameState.bestNetWorth;
+      gameState.tapLevel = saved.tapLevel ?? gameState.tapLevel;
+      gameState.tapBase = saved.tapBase ?? gameState.tapBase;
+      gameState.managers = saved.managers ?? {};
+      gameState.cities = saved.cities ?? { CITY_START: true };
+      gameState.missions = saved.missions ?? {};
+      gameState.prestigeLevel = saved.prestigeLevel ?? 0;
+      gameState.prestigeMultiplier = saved.prestigeMultiplier ?? 1.0;
+      gameState.lastLogoutAt = saved.lastLogoutAt ?? null;
+
       applyUpgradesEffects();
-      computeNetWorth();
+      applyOfflineEarnings();
       recalcPassiveIncome();
+      computeNetWorth();
       computeRiskProfile();
-      renderStats(gameState.netWorth, gameState.riskScore);
-      renderMarket();
-      renderUpgrades();
-      renderEvents();
-      renderTicker();
+      renderAll();
+    } else {
+      gameState.cities = { CITY_START: true };
+      renderAll();
     }
   }
 
@@ -1819,56 +2690,13 @@
       console.error(error);
       return;
     }
-
-    const list = document.getElementById("leaderboard-list");
-    list.innerHTML = "";
-
-    let topNet = 0;
-    let players = data.length;
-    let myRank = "–";
-
-    data.forEach((row, index) => {
-      if (index === 0) topNet = row.best_net_worth;
-      if (currentUser && row.id === currentUser.id) {
-        myRank = "#" + (index + 1);
-      }
-
-      const rowEl = document.createElement("div");
-      rowEl.className = "leader-row rank-" + (index + 1);
-
-      const rank = document.createElement("div");
-      rank.className = "leader-rank";
-      rank.textContent = "#" + (index + 1);
-
-      const name = document.createElement("div");
-      name.className = "leader-name";
-      name.textContent = row.username || "Anonymous";
-
-      const net = document.createElement("div");
-      net.className = "leader-net";
-      net.textContent = fmtMoney(row.best_net_worth || 0);
-
-      const updated = document.createElement("div");
-      updated.className = "leader-updated";
-      updated.textContent = row.updated_at ? new Date(row.updated_at).toLocaleString() : "";
-
-      rowEl.appendChild(rank);
-      rowEl.appendChild(name);
-      rowEl.appendChild(net);
-      rowEl.appendChild(updated);
-
-      list.appendChild(rowEl);
-    });
-
-    document.getElementById("metric-top-net").textContent = fmtMoney(topNet || 0);
-    document.getElementById("metric-players").textContent = players;
-    document.getElementById("metric-rank").textContent = myRank;
+    renderLeaderboard(data || []);
   }
 
   // =========================
   // Auth UI Handlers
   // =========================
-  let authMode = "signin"; // or "signup"
+  let authMode = "signin";
 
   function setAuthMode(mode) {
     authMode = mode;
@@ -1911,10 +2739,10 @@
     try {
       if (authMode === "signin") {
         await signIn(email, password);
-        msg.innerHTML = '<div class="auth-success">Signed in successfully.</div>';
+        msg.innerHTML = '<div class="auth-success">Signed in successfully. Loading your empire…</div>';
       } else {
         await signUp(email, password, username || email.split("@")[0]);
-        msg.innerHTML = '<div class="auth-success">Account created. Check your email if confirmation is required.</div>';
+        msg.innerHTML = '<div class="auth-success">Account created. Your new empire is ready.</div>';
       }
     } catch (err) {
       console.error(err);
@@ -1941,28 +2769,46 @@
     });
   });
 
+  // Tap & prestige handlers
+  document.getElementById("tap-earn-btn").addEventListener("click", tapEarn);
+  document.getElementById("tap-upgrade-btn").addEventListener("click", upgradeTap);
+  document.getElementById("prestige-btn").addEventListener("click", prestigeReset);
+
+  // Update log handlers
+  document.getElementById("open-update-full").addEventListener("click", () => {
+    renderUpdateLogFull();
+    document.getElementById("update-log-fullscreen").style.display = "block";
+  });
+
+  document.getElementById("close-update-full").addEventListener("click", () => {
+    document.getElementById("update-log-fullscreen").style.display = "none";
+  });
+
   // =========================
   // Init
   // =========================
   function initGame() {
-    // Initialize asset states
     for (const asset of ALL_ASSETS) {
       ensureAssetState(asset);
+    }
+    if (!Object.keys(gameState.cities).length) {
+      gameState.cities = { CITY_START: true };
     }
     recalcPassiveIncome();
     computeNetWorth();
     computeRiskProfile();
-    renderStats(gameState.netWorth, gameState.riskScore);
-    renderMarket();
-    renderUpgrades();
-    renderEvents();
-    renderTicker();
+    renderAll();
+    renderUpdateLogCorner();
   }
 
   initGame();
   loadSession();
 
-  setInterval(tickMarket, TICK_INTERVAL_MS);
+  setInterval(() => {
+    if (document.getElementById("game-root").style.display !== "none") {
+      tickMarket();
+    }
+  }, TICK_INTERVAL_MS);
 </script>
 </body>
 </html>

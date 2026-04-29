@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Capital Tycoon – Web Wealth Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Supabase CDN -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2.48.0/dist/umd/supabase.js"></script>
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-alt: #0b1020;
+      --card: #111827;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.15);
+      --danger: #ef4444;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --yellow: #facc15;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+      --orange: #fb923c;
+      --shadow-soft: 0 18px 40px rgba(0,0,0,0.45);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.6));
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background: conic-gradient(from 210deg, #22c55e, #3b82f6, #a855f7, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0b1120;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 0 0 2px rgba(15,23,42,0.9), 0 12px 30px rgba(34,197,94,0.45);
+    }
+
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 18px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .auth-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.8);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+    }
+
+    .btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 6px 14px;
+      font-size: 13px;
+      background: rgba(15,23,42,0.9);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease-out;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: rgba(34,197,94,0.8);
+      color: #022c22;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(34,197,94,0.45);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(34,197,94,0.55);
+    }
+
+    .btn-ghost {
+      background: transparent;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    main {
+      flex: 1;
+      padding: 18px 18px 32px;
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.12), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent 55%),
+                  rgba(15,23,42,0.96);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 720px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .stat {
+      background: rgba(15,23,42,0.9);
+      border-radius: var(--radius-md);
+      padding: 8px 9px;
+      border: 1px solid rgba(31,41,55,0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .stat-chip {
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(34,197,94,0.12);
+      border-radius: var(--radius-pill);
+      padding: 2px 7px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .stat-chip.negative {
+      color: var(--danger);
+      background: rgba(239,68,68,0.12);
+    }
+
+    .stat-chip.neutral {
+      color: var(--muted);
+      background: rgba(148,163,184,0.12);
+    }
+
+    .stat-chip span {
+      font-size: 10px;
+    }
+
+    .stat-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.12;
+      background: radial-gradient(circle at top right, rgba(34,197,94,0.6), transparent 55%);
+      pointer-events: none;
+    }
+
+    .stat:nth-child(2) .stat-bg {
+      background: radial-gradient(circle at top right, rgba(59,130,246,0.6), transparent 55%);
+    }
+
+    .stat:nth-child(3) .stat-bg {
+      background: radial-gradient(circle at top right, rgba(250,204,21,0.7), transparent 55%);
+    }
+
+    .stat:nth-child(4) .stat-bg {
+      background: radial-gradient(circle at top right, rgba(168,85,247,0.7), transparent 55%);
+    }
+
+    .market-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab.active {
+      border-color: rgba(34,197,94,0.9);
+      color: var(--accent);
+      background: rgba(22,163,74,0.12);
+    }
+
+    .tab-pill {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+    }
+
+    .market-list {
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-right: -4px;
+    }
+
+    .asset-row {
+      display: grid;
+      grid-template-columns: 1.8fr 1.1fr 1.1fr 1.4fr;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .asset-row {
+        grid-template-columns: 1.6fr 1fr 1fr;
+        grid-template-rows: auto auto;
+      }
+      .asset-row .asset-actions {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .asset-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .asset-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .asset-tagline {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .asset-meta {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .asset-pill {
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(31,41,55,0.9);
+    }
+
+    .asset-pill.green {
+      border-color: rgba(34,197,94,0.7);
+      color: var(--accent);
+      background: rgba(22,163,74,0.12);
+    }
+
+    .asset-pill.red {
+      border-color: rgba(239,68,68,0.7);
+      color: var(--danger);
+      background: rgba(239,68,68,0.12);
+    }
+
+    .asset-pill.blue {
+      border-color: rgba(59,130,246,0.7);
+      color: var(--blue);
+      background: rgba(37,99,235,0.12);
+    }
+
+    .asset-pill.yellow {
+      border-color: rgba(250,204,21,0.7);
+      color: var(--yellow);
+      background: rgba(250,204,21,0.12);
+    }
+
+    .asset-pill.purple {
+      border-color: rgba(168,85,247,0.7);
+      color: var(--purple);
+      background: rgba(147,51,234,0.12);
+    }
+
+    .asset-price {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .asset-change {
+      font-size: 11px;
+    }
+
+    .asset-change.positive {
+      color: var(--accent);
+    }
+
+    .asset-change.negative {
+      color: var(--danger);
+    }
+
+    .asset-owned {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .asset-actions {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn-xs {
+      padding: 3px 7px;
+      font-size: 11px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-xs.primary {
+      border-color: rgba(34,197,94,0.9);
+      color: var(--accent);
+      background: rgba(22,163,74,0.12);
+    }
+
+    .btn-xs.danger {
+      border-color: rgba(239,68,68,0.9);
+      color: var(--danger);
+      background: rgba(239,68,68,0.12);
+    }
+
+    .btn-xs:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .events-log {
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 11px;
+      padding: 8px 9px;
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      margin-top: 8px;
+    }
+
+    .event-line {
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    .event-line.positive {
+      color: var(--accent);
+    }
+
+    .event-line.negative {
+      color: var(--danger);
+    }
+
+    .event-line strong {
+      color: var(--text);
+    }
+
+    .panel {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(55,65,81,0.9);
+    }
+
+    .panel-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .upgrades-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .upgrades-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .upgrade-card {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      padding: 8px 9px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .upgrade-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .upgrade-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .upgrade-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .upgrade-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .upgrade-cost {
+      font-size: 11px;
+      color: var(--yellow);
+    }
+
+    .login-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 960px) {
+      .login-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .login-hero {
+      padding: 14px 14px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.18), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(59,130,246,0.18), transparent 55%),
+                  rgba(15,23,42,0.96);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .login-hero-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .login-hero-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .login-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .login-pill {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+    }
+
+    .login-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .login-metric {
+      padding: 7px 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .login-metric-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 2px;
+    }
+
+    .login-metric-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .login-form-card {
+      padding: 14px 14px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.96);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .form-row {
+      margin-bottom: 8px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .input {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 9px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: rgba(34,197,94,0.9);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.5);
+    }
+
+    .form-help {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .toggle-auth {
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+    }
+
+    .auth-error {
+      font-size: 11px;
+      color: var(--danger);
+      margin-top: 4px;
+    }
+
+    .auth-success {
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .leaderboard-list {
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-right: -4px;
+      font-size: 12px;
+    }
+
+    .leader-row {
+      display: grid;
+      grid-template-columns: 0.6fr 1.6fr 1.2fr 1.2fr;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      margin-bottom: 6px;
+    }
+
+    .leader-rank {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .leader-name {
+      font-weight: 500;
+    }
+
+    .leader-net {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .leader-updated {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .rank-1 .leader-rank {
+      color: var(--yellow);
+    }
+
+    .rank-2 .leader-rank {
+      color: var(--muted);
+    }
+
+    .rank-3 .leader-rank {
+      color: var(--orange);
+    }
+
+    .ticker {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ticker-pill {
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .ticker-pill.green {
+      border-color: rgba(34,197,94,0.9);
+      color: var(--accent);
+    }
+
+    .ticker-pill.red {
+      border-color: rgba(239,68,68,0.9);
+      color: var(--danger);
+    }
+
+    .ticker-pill.blue {
+      border-color: rgba(59,130,246,0.9);
+      color: var(--blue);
+    }
+
+    .ticker-pill.yellow {
+      border-color: rgba(250,204,21,0.9);
+      color: var(--yellow);
+    }
+
+    .small-muted {
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-logo">£</div>
+    <div>
+      <div class="brand-title">Capital Tycoon</div>
+      <div class="brand-sub">Web Wealth Simulator</div>
+    </div>
+  </div>
+  <div class="auth-bar">
+    <div id="session-pill" class="pill">
+      <span class="pill-dot" id="session-dot"></span>
+      <span id="session-text">Not signed in</span>
+    </div>
+    <button id="logout-btn" class="btn btn-ghost" style="display:none;">Logout</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: GAME -->
+  <section class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Portfolio Overview</div>
+        <div class="card-subtitle">Build your empire across stocks, crypto, and businesses.</div>
+      </div>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span id="tick-label">Tick: 0</span>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-bg"></div>
+        <div class="stat-label">Cash</div>
+        <div class="stat-value" id="stat-cash">£0</div>
+        <div class="stat-chip neutral">
+          <span>Liquid</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-bg"></div>
+        <div class="stat-label">Net Worth</div>
+        <div class="stat-value" id="stat-networth">£0</div>
+        <div class="stat-chip" id="stat-networth-change">
+          <span>Δ 0%</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-bg"></div>
+        <div class="stat-label">Passive Income / Tick</div>
+        <div class="stat-value" id="stat-income">£0</div>
+        <div class="stat-chip">
+          <span id="stat-income-desc">0 sources</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-bg"></div>
+        <div class="stat-label">Risk Profile</div>
+        <div class="stat-value" id="stat-risk">Balanced</div>
+        <div class="stat-chip neutral">
+          <span id="stat-risk-desc">Diversified</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticker" id="ticker">
+      <!-- dynamic market summary -->
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Markets</div>
+      <div class="market-tabs">
+        <button class="tab active" data-market="stocks">
+          Stocks
+          <span class="tab-pill" id="tab-stocks-count">0 owned</span>
+        </button>
+        <button class="tab" data-market="crypto">
+          Crypto
+          <span class="tab-pill" id="tab-crypto-count">0 owned</span>
+        </button>
+        <button class="tab" data-market="businesses">
+          Businesses
+          <span class="tab-pill" id="tab-businesses-count">0 owned</span>
+        </button>
+      </div>
+      <div class="market-list" id="market-list"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Upgrades & Automation</div>
+      <div class="upgrades-grid" id="upgrades-grid">
+        <!-- dynamic upgrades -->
+      </div>
+      <div class="small-muted" style="margin-top:6px;">
+        Upgrades permanently improve your earning power, volatility resistance, or unlock new mechanics.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Events & News</div>
+      <div class="events-log" id="events-log"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT: AUTH + LEADERBOARD -->
+  <section>
+    <div class="login-layout">
+      <div class="login-hero">
+        <div class="login-hero-title">Compete for the Global Rich List.</div>
+        <div class="login-hero-sub">
+          Sign in to save your progress, sync across devices, and climb the Supabase‑powered leaderboard.
+        </div>
+        <div class="login-pills">
+          <div class="login-pill">Real‑time Supabase auth</div>
+          <div class="login-pill">Persistent cloud saves</div>
+          <div class="login-pill">Global leaderboard</div>
+          <div class="login-pill">Random market events</div>
+          <div class="login-pill">Stocks · Crypto · Businesses</div>
+        </div>
+        <div class="login-metrics">
+          <div class="login-metric">
+            <div class="login-metric-label">Top Net Worth</div>
+            <div class="login-metric-value" id="metric-top-net">£0</div>
+          </div>
+          <div class="login-metric">
+            <div class="login-metric-label">Active Tycoons</div>
+            <div class="login-metric-value" id="metric-players">0</div>
+          </div>
+          <div class="login-metric">
+            <div class="login-metric-label">Your Rank</div>
+            <div class="login-metric-value" id="metric-rank">–</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="login-form-card">
+        <div class="card-header" style="margin-bottom:8px;">
+          <div>
+            <div class="card-title" id="auth-mode-label">Sign In</div>
+            <div class="card-subtitle">Use email + password. No spam, no nonsense.</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="auth-email">Email</label>
+          <input id="auth-email" class="input" type="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="auth-password">Password</label>
+          <input id="auth-password" class="input" type="password" placeholder="••••••••" />
+          <div class="form-help">Minimum 6 characters. This is handled by Supabase auth.</div>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="auth-username">Username (for leaderboard)</label>
+          <input id="auth-username" class="input" type="text" placeholder="Tycoon name" />
+          <div class="form-help">Shown on the global leaderboard. You can change it later.</div>
+        </div>
+        <div class="form-actions">
+          <button id="auth-submit" class="btn btn-primary">
+            <span id="auth-submit-label">Sign In</span>
+          </button>
+          <div>
+            <div class="small-muted">No account?</div>
+            <div class="toggle-auth" id="toggle-auth">Switch to Sign Up</div>
+          </div>
+        </div>
+        <div id="auth-message"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Global Leaderboard</div>
+          <div class="card-subtitle">Top 20 tycoons by peak net worth.</div>
+        </div>
+        <button id="refresh-leaderboard" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">
+          Refresh
+        </button>
+      </div>
+      <div class="leaderboard-list" id="leaderboard-list"></div>
+      <div class="small-muted" style="margin-top:6px;">
+        Your best net worth is automatically submitted every few ticks and on logout.
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // =========================
+  // Supabase Setup
+  // =========================
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // =========================
+  // Game State
+  // =========================
+  const TICK_INTERVAL_MS = 2000; // 2 seconds per tick
+  let tickCount = 0;
+  let lastNetWorth = 1000;
+
+  const gameState = {
+    cash: 1000,
+    netWorth: 1000,
+    passiveIncomePerTick: 0,
+    riskScore: 0.5, // 0 = ultra safe, 1 = ultra degen
+    assets: {
+      stocks: {},
+      crypto: {},
+      businesses: {}
+    },
+    upgrades: {},
+    lastEvents: [],
+    bestNetWorth: 1000
+  };
+
+  // Asset definitions (TON of content)
+  const STOCKS = [
+    { id: "FTSE_BLUE", name: "FTSE BlueChip ETF", type: "stocks", basePrice: 120, volatility: 0.03, incomeYield: 0.01, tagline: "Broad UK exposure, low volatility.", tags: ["Defensive", "Dividend"], sector: "Index" },
+    { id: "UK_TECH", name: "Albion Cloud Systems", type: "stocks", basePrice: 80, volatility: 0.07, incomeYield: 0.0, tagline: "High‑growth UK SaaS darling.", tags: ["Growth", "Tech"], sector: "Technology" },
+    { id: "GLOBAL_GREEN", name: "Global Green Energy Fund", type: "stocks", basePrice: 150, volatility: 0.05, incomeYield: 0.015, tagline: "Renewables, ESG‑tilted.", tags: ["ESG", "Energy"], sector: "Energy" },
+    { id: "LUXURY_BRANDS", name: "Crown & Velvet Group", type: "stocks", basePrice: 210, volatility: 0.06, incomeYield: 0.012, tagline: "Luxury goods, resilient margins.", tags: ["Luxury", "Consumer"], sector: "Consumer" },
+    { id: "BANKING_UK", name: "Royal Thames Bank", type: "stocks", basePrice: 95, volatility: 0.04, incomeYield: 0.02, tagline: "Dividends with rate sensitivity.", tags: ["Dividend", "Finance"], sector: "Finance" },
+    { id: "HEALTHCARE_GLOBAL", name: "Global Health Innovators", type: "stocks", basePrice: 130, volatility: 0.045, incomeYield: 0.008, tagline: "Pharma & med‑tech R&D.", tags: ["Defensive", "Health"], sector: "Healthcare" },
+    { id: "EMERGING_MKTS", name: "Emerging Horizons ETF", type: "stocks", basePrice: 70, volatility: 0.09, incomeYield: 0.0, tagline: "High risk, high potential.", tags: ["Emerging", "Volatile"], sector: "Index" }
+  ];
+
+  const CRYPTO = [
+    { id: "BTC", name: "Bitcoin", type: "crypto", basePrice: 30000, volatility: 0.12, incomeYield: 0.0, tagline: "Digital gold, wild swings.", tags: ["Store of value", "Volatile"] },
+    { id: "ETH", name: "Ethereum", type: "crypto", basePrice: 2000, volatility: 0.11, incomeYield: 0.0, tagline: "Smart contract backbone.", tags: ["Smart contracts", "Growth"] },
+    { id: "STABLE_GBP", name: "Sterling Stablecoin", type: "crypto", basePrice: 1, volatility: 0.001, incomeYield: 0.0, tagline: "Pegged to GBP, low risk.", tags: ["Stable", "Low risk"] },
+    { id: "DEFI_YIELD", name: "DeFi Yield Index", type: "crypto", basePrice: 150, volatility: 0.16, incomeYield: 0.02, tagline: "High yield, protocol risk.", tags: ["Yield", "DeFi"] },
+    { id: "MEME_COIN", name: "CorgiCoin", type: "crypto", basePrice: 0.02, volatility: 0.25, incomeYield: 0.0, tagline: "Pure speculation, pure chaos.", tags: ["Meme", "Ultra‑volatile"] }
+  ];
+
+  const BUSINESSES = [
+    { id: "COFFEE_CHAIN", name: "High Street Coffee Co.", type: "businesses", basePrice: 5000, volatility: 0.03, incomeYield: 0.06, tagline: "Franchise coffee shops across the UK.", tags: ["Brick & mortar", "Cashflow"], baseIncome: 120 },
+    { id: "SAAS_TOOL", name: "Subscriptly CRM", type: "businesses", basePrice: 8000, volatility: 0.05, incomeYield: 0.09, tagline: "B2B subscription CRM platform.", tags: ["SaaS", "Recurring"], baseIncome: 220 },
+    { id: "RENTAL_UNITS", name: "Urban Flats Portfolio", type: "businesses", basePrice: 12000, volatility: 0.04, incomeYield: 0.07, tagline: "Residential rentals in major cities.", tags: ["Property", "Yield"], baseIncome: 320 },
+    { id: "E_COMMERCE", name: "Midnight Market", type: "businesses", basePrice: 6000, volatility: 0.06, incomeYield: 0.08, tagline: "Niche e‑commerce marketplace.", tags: ["Online", "Scalable"], baseIncome: 180 },
+    { id: "AI_AGENCY", name: "Prompt & Co. AI Studio", type: "businesses", basePrice: 10000, volatility: 0.08, incomeYield: 0.1, tagline: "AI consulting & automation.", tags: ["AI", "High margin"], baseIncome: 260 }
+  ];
+
+  const ALL_ASSETS = [...STOCKS, ...CRYPTO, ...BUSINESSES];
+
+  const UPGRADES = [
+    { id: "RISK_ANALYTICS", name: "Risk Analytics Suite", description: "Reduce downside volatility across all assets by ~10%.", cost: 4000, effect: { volatilityMultiplier: 0.9 } },
+    { id: "TAX_OPTIMISATION", name: "Tax Optimisation", description: "Reduce negative impact of tax events by 30%.", cost: 6000, effect: { taxHitMultiplier: 0.7 } },
+    { id: "AUTO_REINVEST", name: "Auto‑Reinvest Engine", description: "Automatically reinvest 20% of passive income into your best asset.", cost: 7000, effect: { autoReinvest: true } },
+    { id: "DIVERSIFICATION", name: "Diversification Playbook", description: "Slightly boosts net worth growth when holding all three classes.", cost: 5000, effect: { diversificationBonus: true } },
+    { id: "ALGO_TRADER", name: "Algo Trader Bot", description: "Small chance each tick to generate bonus trading profit.", cost: 9000, effect: { algoTrader: true } }
+  ];
+
+  // Runtime modifiers from upgrades
+  const modifiers = {
+    volatilityMultiplier: 1,
+    taxHitMultiplier: 1,
+    autoReinvest: false,
+    diversificationBonus: false,
+    algoTrader: false
+  };
+
+  // =========================
+  // Utility
+  // =========================
+  function fmtMoney(value) {
+    if (value >= 1_000_000_000) return "£" + (value / 1_000_000_000).toFixed(2) + "B";
+    if (value >= 1_000_000) return "£" + (value / 1_000_000).toFixed(2) + "M";
+    if (value >= 1_000) return "£" + (value / 1_000).toFixed(2) + "k";
+    return "£" + value.toFixed(2);
+  }
+
+  function fmtPercent(value) {
+    const sign = value > 0 ? "+" : "";
+    return sign + (value * 100).toFixed(1) + "%";
+  }
+
+  function randomNormal() {
+    // Box-Muller
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  }
+
+  function addEvent(message, type = "neutral") {
+    gameState.lastEvents.unshift({ message, type, tick: tickCount });
+    if (gameState.lastEvents.length > 20) gameState.lastEvents.pop();
+    renderEvents();
+  }
+
+  // =========================
+  // Game Logic
+  // =========================
+  function ensureAssetState(asset) {
+    const bucket = gameState.assets[asset.type];
+    if (!bucket[asset.id]) {
+      bucket[asset.id] = {
+        quantity: 0,
+        price: asset.basePrice,
+        lastChange: 0,
+        incomePerTick: asset.type === "businesses" ? (asset.baseIncome || 0) : asset.basePrice * asset.incomeYield
+      };
+    }
+    return bucket[asset.id];
+  }
+
+  function recalcPassiveIncome() {
+    let total = 0;
+    let sources = 0;
+    for (const asset of ALL_ASSETS) {
+      const state = ensureAssetState(asset);
+      if (state.quantity > 0 && state.incomePerTick > 0) {
+        total += state.incomePerTick * state.quantity;
+        sources++;
+      }
+    }
+    gameState.passiveIncomePerTick = total;
+    return { total, sources };
+  }
+
+  function computeNetWorth() {
+    let worth = gameState.cash;
+    for (const asset of ALL_ASSETS) {
+      const state = ensureAssetState(asset);
+      worth += state.price * state.quantity;
+    }
+    gameState.netWorth = worth;
+    if (worth > gameState.bestNetWorth) {
+      gameState.bestNetWorth = worth;
+    }
+    return worth;
+  }
+
+  function computeRiskProfile() {
+    let risk = 0.5;
+    let totalValue = 0;
+    let cryptoValue = 0;
+    let stableValue = 0;
+    let stockValue = 0;
+    let businessValue = 0;
+
+    for (const asset of ALL_ASSETS) {
+      const state = ensureAssetState(asset);
+      const value = state.price * state.quantity;
+      totalValue += value;
+      if (asset.type === "crypto") {
+        cryptoValue += value;
+        if (asset.id === "STABLE_GBP") stableValue += value;
+      } else if (asset.type === "stocks") {
+        stockValue += value;
+      } else if (asset.type === "businesses") {
+        businessValue += value;
+      }
+    }
+
+    if (totalValue > 0) {
+      const cryptoShare = cryptoValue / totalValue;
+      const stableShare = stableValue / totalValue;
+      const businessShare = businessValue / totalValue;
+      const stockShare = stockValue / totalValue;
+
+      risk = 0.3 + cryptoShare * 0.5 - stableShare * 0.2 - businessShare * 0.1 - stockShare * 0.05;
+      risk = Math.min(1, Math.max(0, risk));
+    }
+
+    gameState.riskScore = risk;
+    return risk;
+  }
+
+  function applyUpgradesEffects() {
+    modifiers.volatilityMultiplier = 1;
+    modifiers.taxHitMultiplier = 1;
+    modifiers.autoReinvest = false;
+    modifiers.diversificationBonus = false;
+    modifiers.algoTrader = false;
+
+    for (const up of UPGRADES) {
+      if (gameState.upgrades[up.id]) {
+        if (up.effect.volatilityMultiplier) {
+          modifiers.volatilityMultiplier *= up.effect.volatilityMultiplier;
+        }
+        if (up.effect.taxHitMultiplier) {
+          modifiers.taxHitMultiplier *= up.effect.taxHitMultiplier;
+        }
+        if (up.effect.autoReinvest) {
+          modifiers.autoReinvest = true;
+        }
+        if (up.effect.diversificationBonus) {
+          modifiers.diversificationBonus = true;
+        }
+        if (up.effect.algoTrader) {
+          modifiers.algoTrader = true;
+        }
+      }
+    }
+  }
+
+  function tickMarket() {
+    tickCount++;
+    document.getElementById("tick-label").textContent = "Tick: " + tickCount;
+
+    // Price movements
+    for (const asset of ALL_ASSETS) {
+      const state = ensureAssetState(asset);
+      const vol = asset.volatility * modifiers.volatilityMultiplier;
+      const shock = randomNormal() * vol;
+      const drift = asset.type === "businesses" ? 0.01 : 0.002;
+      const change = drift + shock;
+      const newPrice = Math.max(0.01, state.price * (1 + change));
+      state.lastChange = (newPrice - state.price) / state.price;
+      state.price = newPrice;
+    }
+
+    // Passive income
+    const { total: income } = recalcPassiveIncome();
+    if (income > 0) {
+      gameState.cash += income;
+      addEvent("You earned " + fmtMoney(income) + " in passive income.", "positive");
+    }
+
+    // Auto reinvest
+    if (modifiers.autoReinvest && income > 0) {
+      const reinvestAmount = income * 0.2;
+      autoReinvest(reinvestAmount);
+    }
+
+    // Random events
+    randomEvents();
+
+    // Diversification bonus
+    if (modifiers.diversificationBonus) {
+      const hasStocks = Object.values(gameState.assets.stocks).some(a => a.quantity > 0);
+      const hasCrypto = Object.values(gameState.assets.crypto).some(a => a.quantity > 0);
+      const hasBiz = Object.values(gameState.assets.businesses).some(a => a.quantity > 0);
+      if (hasStocks && hasCrypto && hasBiz) {
+        const bonus = gameState.netWorth * 0.002;
+        gameState.cash += bonus;
+        addEvent("Diversification bonus: " + fmtMoney(bonus) + " added to cash.", "positive");
+      }
+    }
+
+    // Algo trader
+    if (modifiers.algoTrader && Math.random() < 0.18) {
+      const profit = 200 + Math.random() * 600;
+      gameState.cash += profit;
+      addEvent("Algo Trader executed a profitable trade: +" + fmtMoney(profit), "positive");
+    }
+
+    // Recompute net worth & risk
+    const net = computeNetWorth();
+    const risk = computeRiskProfile();
+
+    // Update UI
+    renderStats(net, risk);
+    renderMarket();
+    renderTicker();
+
+    // Periodically sync to Supabase
+    if (currentUser) {
+      if (tickCount % 5 === 0) {
+        saveGameState();
+        submitLeaderboard();
+      }
+    }
+  }
+
+  function autoReinvest(amount) {
+    // Find best asset by lastChange or income
+    let bestAsset = null;
+    let bestScore = -Infinity;
+    for (const asset of ALL_ASSETS) {
+      const state = ensureAssetState(asset);
+      const score = state.lastChange * 0.7 + (state.incomePerTick || 0) * 0.0003;
+      if (score > bestScore) {
+        bestScore = score;
+        bestAsset = asset;
+      }
+    }
+    if (!bestAsset) return;
+    const state = ensureAssetState(bestAsset);
+    const qty = Math.floor(amount / state.price);
+    if (qty > 0) {
+      state.quantity += qty;
+      gameState.cash -= qty * state.price;
+      addEvent("Auto‑Reinvest bought " + qty + "x " + bestAsset.name + ".", "positive");
+    }
+  }
+
+  function randomEvents() {
+    const roll = Math.random();
+    if (roll < 0.08) {
+      // Market boom
+      const factor = 1.1 + Math.random() * 0.15;
+      for (const asset of ALL_ASSETS) {
+        const state = ensureAssetState(asset);
+        if (asset.type === "stocks") {
+          state.price *= factor;
+          state.lastChange = factor - 1;
+        }
+      }
+      addEvent("Equity markets rally! Stocks jump " + fmtPercent(factor - 1) + ".", "positive");
+    } else if (roll < 0.14) {
+      // Crypto crash
+      const factor = 0.7 + Math.random() * 0.15;
+      for (const asset of ALL_ASSETS) {
+        const state = ensureAssetState(asset);
+        if (asset.type === "crypto" && asset.id !== "STABLE_GBP") {
+          state.price *= factor;
+          state.lastChange = factor - 1;
+        }
+      }
+      addEvent("Crypto crash! Risk assets fall " + fmtPercent(factor - 1) + ".", "negative");
+    } else if (roll < 0.18) {
+      // Tax event
+      const hit = gameState.cash * 0.12 * modifiers.taxHitMultiplier;
+      gameState.cash -= hit;
+      addEvent("Tax bill due: " + fmtMoney(hit) + " paid.", "negative");
+    } else if (roll < 0.22) {
+      // Windfall
+      const bonus = 500 + Math.random() * 1500;
+      gameState.cash += bonus;
+      addEvent("Unexpected windfall: " + fmtMoney(bonus) + " credited.", "positive");
+    }
+  }
+
+  function buyAsset(assetId, type, qty) {
+    const asset = ALL_ASSETS.find(a => a.id === assetId && a.type === type);
+    if (!asset) return;
+    const state = ensureAssetState(asset);
+    const cost = state.price * qty;
+    if (cost > gameState.cash) {
+      addEvent("Not enough cash to buy " + qty + "x " + asset.name + ".", "negative");
+      return;
+    }
+    gameState.cash -= cost;
+    state.quantity += qty;
+    addEvent("Bought " + qty + "x " + asset.name + " for " + fmtMoney(cost) + ".", "positive");
+    computeNetWorth();
+    recalcPassiveIncome();
+    computeRiskProfile();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderMarket();
+  }
+
+  function sellAsset(assetId, type, qty) {
+    const asset = ALL_ASSETS.find(a => a.id === assetId && a.type === type);
+    if (!asset) return;
+    const state = ensureAssetState(asset);
+    if (qty > state.quantity) qty = state.quantity;
+    if (qty <= 0) return;
+    const proceeds = state.price * qty;
+    state.quantity -= qty;
+    gameState.cash += proceeds;
+    addEvent("Sold " + qty + "x " + asset.name + " for " + fmtMoney(proceeds) + ".", "positive");
+    computeNetWorth();
+    recalcPassiveIncome();
+    computeRiskProfile();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderMarket();
+  }
+
+  function buyUpgrade(upgradeId) {
+    const up = UPGRADES.find(u => u.id === upgradeId);
+    if (!up) return;
+    if (gameState.upgrades[up.id]) {
+      addEvent(up.name + " already purchased.", "negative");
+      return;
+    }
+    if (gameState.cash < up.cost) {
+      addEvent("Not enough cash for " + up.name + ".", "negative");
+      return;
+    }
+    gameState.cash -= up.cost;
+    gameState.upgrades[up.id] = true;
+    addEvent("Upgrade acquired: " + up.name + ".", "positive");
+    applyUpgradesEffects();
+    computeNetWorth();
+    recalcPassiveIncome();
+    computeRiskProfile();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderUpgrades();
+  }
+
+  // =========================
+  // Rendering
+  // =========================
+  function renderStats(netWorth, risk) {
+    document.getElementById("stat-cash").textContent = fmtMoney(gameState.cash);
+    document.getElementById("stat-networth").textContent = fmtMoney(netWorth);
+    document.getElementById("stat-income").textContent = fmtMoney(gameState.passiveIncomePerTick);
+
+    const { sources } = recalcPassiveIncome();
+    document.getElementById("stat-income-desc").textContent = sources + " income sources";
+
+    const change = (netWorth - lastNetWorth) / Math.max(1, lastNetWorth);
+    lastNetWorth = netWorth;
+    const changeEl = document.getElementById("stat-networth-change");
+    changeEl.textContent = "Δ " + (change * 100).toFixed(2) + "%";
+    changeEl.classList.remove("negative");
+    if (change < 0) changeEl.classList.add("negative");
+
+    let riskLabel = "Balanced";
+    let riskDesc = "Diversified";
+    if (risk < 0.25) {
+      riskLabel = "Conservative";
+      riskDesc = "Low volatility, income‑oriented.";
+    } else if (risk < 0.5) {
+      riskLabel = "Moderate";
+      riskDesc = "Mix of growth and safety.";
+    } else if (risk < 0.75) {
+      riskLabel = "Aggressive";
+      riskDesc = "High growth, higher drawdowns.";
+    } else {
+      riskLabel = "Degenerate";
+      riskDesc = "You live for volatility.";
+    }
+    document.getElementById("stat-risk").textContent = riskLabel;
+    document.getElementById("stat-risk-desc").textContent = riskDesc;
+
+    // Tab counts
+    const stocksOwned = Object.values(gameState.assets.stocks).reduce((s, a) => s + (a.quantity || 0), 0);
+    const cryptoOwned = Object.values(gameState.assets.crypto).reduce((s, a) => s + (a.quantity || 0), 0);
+    const bizOwned = Object.values(gameState.assets.businesses).reduce((s, a) => s + (a.quantity || 0), 0);
+    document.getElementById("tab-stocks-count").textContent = stocksOwned + " owned";
+    document.getElementById("tab-crypto-count").textContent = cryptoOwned + " owned";
+    document.getElementById("tab-businesses-count").textContent = bizOwned + " owned";
+  }
+
+  function renderMarket() {
+    const activeTab = document.querySelector(".tab.active")?.dataset.market || "stocks";
+    const listEl = document.getElementById("market-list");
+    listEl.innerHTML = "";
+
+    const assets = activeTab === "stocks" ? STOCKS : activeTab === "crypto" ? CRYPTO : BUSINESSES;
+
+    for (const asset of assets) {
+      const state = ensureAssetState(asset);
+      const row = document.createElement("div");
+      row.className = "asset-row";
+
+      const main = document.createElement("div");
+      main.className = "asset-main";
+      const name = document.createElement("div");
+      name.className = "asset-name";
+      name.textContent = asset.name;
+      const tagline = document.createElement("div");
+      tagline.className = "asset-tagline";
+      tagline.textContent = asset.tagline;
+      const meta = document.createElement("div");
+      meta.className = "asset-meta";
+
+      const sectorPill = document.createElement("span");
+      sectorPill.className = "asset-pill";
+      sectorPill.textContent = asset.sector || asset.type.toUpperCase();
+      meta.appendChild(sectorPill);
+
+      if (asset.incomeYield > 0 || asset.baseIncome) {
+        const incomePill = document.createElement("span");
+        incomePill.className = "asset-pill green";
+        if (asset.baseIncome) {
+          incomePill.textContent = "Income: " + fmtMoney(asset.baseIncome) + "/tick";
+        } else {
+          incomePill.textContent = "Yield: " + fmtPercent(asset.incomeYield);
+        }
+        meta.appendChild(incomePill);
+      }
+
+      const volPill = document.createElement("span");
+      volPill.className = "asset-pill purple";
+      volPill.textContent = "Vol: " + (asset.volatility * 100).toFixed(1) + "%";
+      meta.appendChild(volPill);
+
+      for (const tag of asset.tags || []) {
+        const tagPill = document.createElement("span");
+        tagPill.className = "asset-pill blue";
+        tagPill.textContent = tag;
+        meta.appendChild(tagPill);
+      }
+
+      main.appendChild(name);
+      main.appendChild(tagline);
+      main.appendChild(meta);
+
+      const priceCol = document.createElement("div");
+      const price = document.createElement("div");
+      price.className = "asset-price";
+      price.textContent = fmtMoney(state.price);
+      const change = document.createElement("div");
+      change.className = "asset-change " + (state.lastChange >= 0 ? "positive" : "negative");
+      change.textContent = fmtPercent(state.lastChange);
+      priceCol.appendChild(price);
+      priceCol.appendChild(change);
+
+      const ownedCol = document.createElement("div");
+      const owned = document.createElement("div");
+      owned.className = "asset-owned";
+      owned.textContent = "Owned: " + state.quantity;
+      const value = document.createElement("div");
+      value.className = "asset-owned";
+      value.textContent = "Value: " + fmtMoney(state.price * state.quantity);
+      ownedCol.appendChild(owned);
+      ownedCol.appendChild(value);
+
+      const actions = document.createElement("div");
+      actions.className = "asset-actions";
+
+      const buy1 = document.createElement("button");
+      buy1.className = "btn-xs primary";
+      buy1.textContent = "Buy 1";
+      buy1.onclick = () => buyAsset(asset.id, asset.type, 1);
+
+      const buyMax = document.createElement("button");
+      buyMax.className = "btn-xs primary";
+      buyMax.textContent = "Buy Max";
+      buyMax.onclick = () => {
+        const maxQty = Math.floor(gameState.cash / state.price);
+        if (maxQty > 0) buyAsset(asset.id, asset.type, maxQty);
+      };
+
+      const sell1 = document.createElement("button");
+      sell1.className = "btn-xs";
+      sell1.textContent = "Sell 1";
+      sell1.onclick = () => sellAsset(asset.id, asset.type, 1);
+      if (state.quantity <= 0) sell1.disabled = true;
+
+      const sellAll = document.createElement("button");
+      sellAll.className = "btn-xs danger";
+      sellAll.textContent = "Sell All";
+      sellAll.onclick = () => sellAsset(asset.id, asset.type, state.quantity);
+      if (state.quantity <= 0) sellAll.disabled = true;
+
+      actions.appendChild(buy1);
+      actions.appendChild(buyMax);
+      actions.appendChild(sell1);
+      actions.appendChild(sellAll);
+
+      row.appendChild(main);
+      row.appendChild(priceCol);
+      row.appendChild(ownedCol);
+      row.appendChild(actions);
+
+      listEl.appendChild(row);
+    }
+  }
+
+  function renderUpgrades() {
+    const grid = document.getElementById("upgrades-grid");
+    grid.innerHTML = "";
+    for (const up of UPGRADES) {
+      const card = document.createElement("div");
+      card.className = "upgrade-card";
+
+      const header = document.createElement("div");
+      header.className = "upgrade-header";
+      const name = document.createElement("div");
+      name.className = "upgrade-name";
+      name.textContent = up.name;
+      const badge = document.createElement("div");
+      badge.className = "asset-pill yellow";
+      badge.textContent = gameState.upgrades[up.id] ? "Owned" : "Available";
+      header.appendChild(name);
+      header.appendChild(badge);
+
+      const meta = document.createElement("div");
+      meta.className = "upgrade-meta";
+      meta.textContent = up.description;
+
+      const footer = document.createElement("div");
+      footer.className = "upgrade-footer";
+      const cost = document.createElement("div");
+      cost.className = "upgrade-cost";
+      cost.textContent = "Cost: " + fmtMoney(up.cost);
+      const btn = document.createElement("button");
+      btn.className = "btn-xs primary";
+      btn.textContent = gameState.upgrades[up.id] ? "Purchased" : "Buy";
+      btn.disabled = !!gameState.upgrades[up.id];
+      btn.onclick = () => buyUpgrade(up.id);
+      footer.appendChild(cost);
+      footer.appendChild(btn);
+
+      card.appendChild(header);
+      card.appendChild(meta);
+      card.appendChild(footer);
+
+      grid.appendChild(card);
+    }
+  }
+
+  function renderEvents() {
+    const log = document.getElementById("events-log");
+    log.innerHTML = "";
+    for (const ev of gameState.lastEvents) {
+      const line = document.createElement("div");
+      line.className = "event-line " + (ev.type === "positive" ? "positive" : ev.type === "negative" ? "negative" : "");
+      line.innerHTML = "<strong>Tick " + ev.tick + ":</strong> " + ev.message;
+      log.appendChild(line);
+    }
+  }
+
+  function renderTicker() {
+    const ticker = document.getElementById("ticker");
+    ticker.innerHTML = "";
+
+    const netChange = (gameState.netWorth - 1000) / 1000;
+    const netPill = document.createElement("span");
+    netPill.className = "ticker-pill " + (netChange >= 0 ? "green" : "red");
+    netPill.textContent = "Net " + fmtPercent(netChange);
+    ticker.appendChild(netPill);
+
+    const stockMove = avgMove(STOCKS);
+    const stockPill = document.createElement("span");
+    stockPill.className = "ticker-pill " + (stockMove >= 0 ? "green" : "red");
+    stockPill.textContent = "Stocks " + fmtPercent(stockMove);
+    ticker.appendChild(stockPill);
+
+    const cryptoMove = avgMove(CRYPTO);
+    const cryptoPill = document.createElement("span");
+    cryptoPill.className = "ticker-pill " + (cryptoMove >= 0 ? "green" : "red");
+    cryptoPill.textContent = "Crypto " + fmtPercent(cryptoMove);
+    ticker.appendChild(cryptoPill);
+
+    const bizMove = avgMove(BUSINESSES);
+    const bizPill = document.createElement("span");
+    bizPill.className = "ticker-pill " + (bizMove >= 0 ? "green" : "red");
+    bizPill.textContent = "Biz " + fmtPercent(bizMove);
+    ticker.appendChild(bizPill);
+  }
+
+  function avgMove(list) {
+    if (!list.length) return 0;
+    let sum = 0;
+    for (const asset of list) {
+      const state = ensureAssetState(asset);
+      sum += state.lastChange;
+    }
+    return sum / list.length;
+  }
+
+  // =========================
+  // Auth & Supabase Persistence
+  // =========================
+  let currentUser = null;
+  let currentProfileUsername = "";
+
+  async function loadSession() {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data.session) {
+      currentUser = data.session.user;
+      updateSessionUI(true);
+      await loadGameState();
+      await loadLeaderboard();
+    } else {
+      updateSessionUI(false);
+    }
+  }
+
+  function updateSessionUI(isLoggedIn) {
+    const sessionText = document.getElementById("session-text");
+    const sessionDot = document.getElementById("session-dot");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    if (isLoggedIn && currentUser) {
+      sessionText.textContent = currentProfileUsername
+        ? currentProfileUsername + " · " + currentUser.email
+        : currentUser.email;
+      sessionDot.style.background = "#22c55e";
+      logoutBtn.style.display = "inline-flex";
+    } else {
+      sessionText.textContent = "Not signed in";
+      sessionDot.style.background = "#ef4444";
+      logoutBtn.style.display = "none";
+    }
+  }
+
+  async function signIn(email, password) {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    currentUser = data.user;
+    await loadGameState();
+    await loadLeaderboard();
+    updateSessionUI(true);
+  }
+
+  async function signUp(email, password, username) {
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { username }
+      }
+    });
+    if (error) throw error;
+    currentUser = data.user;
+    currentProfileUsername = username || (currentUser && currentUser.email);
+    await saveGameState(true);
+    await submitLeaderboard();
+    updateSessionUI(true);
+  }
+
+  async function signOut() {
+    await saveGameState();
+    await submitLeaderboard();
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+    currentProfileUsername = "";
+    updateSessionUI(false);
+  }
+
+  async function loadGameState() {
+    if (!currentUser) return;
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (!data) {
+      // create default profile
+      currentProfileUsername = currentUser.user_metadata?.username || currentUser.email;
+      await saveGameState(true);
+      return;
+    }
+
+    currentProfileUsername = data.username || currentUser.email;
+
+    if (data.game_state) {
+      const saved = data.game_state;
+      gameState.cash = saved.cash ?? gameState.cash;
+      gameState.netWorth = saved.netWorth ?? gameState.netWorth;
+      gameState.passiveIncomePerTick = saved.passiveIncomePerTick ?? gameState.passiveIncomePerTick;
+      gameState.riskScore = saved.riskScore ?? gameState.riskScore;
+      gameState.assets = saved.assets ?? gameState.assets;
+      gameState.upgrades = saved.upgrades ?? gameState.upgrades;
+      gameState.lastEvents = saved.lastEvents ?? [];
+      gameState.bestNetWorth = saved.bestNetWorth ?? gameState.bestNetWorth;
+      applyUpgradesEffects();
+      computeNetWorth();
+      recalcPassiveIncome();
+      computeRiskProfile();
+      renderStats(gameState.netWorth, gameState.riskScore);
+      renderMarket();
+      renderUpgrades();
+      renderEvents();
+      renderTicker();
+    }
+  }
+
+  async function saveGameState(isNew = false) {
+    if (!currentUser) return;
+    const payload = {
+      id: currentUser.id,
+      username: currentProfileUsername || currentUser.email,
+      cash: gameState.cash,
+      net_worth: gameState.netWorth,
+      total_income_per_tick: gameState.passiveIncomePerTick,
+      game_state: gameState
+    };
+
+    let query = supabaseClient.from("profiles");
+    const { error } = isNew
+      ? await query.insert(payload)
+      : await query.upsert(payload);
+
+    if (error) {
+      console.error("Error saving game state", error);
+    }
+  }
+
+  async function submitLeaderboard() {
+    if (!currentUser) return;
+    const payload = {
+      id: currentUser.id,
+      username: currentProfileUsername || currentUser.email,
+      best_net_worth: gameState.bestNetWorth
+    };
+    const { error } = await supabaseClient
+      .from("leaderboard")
+      .upsert(payload);
+    if (error) console.error("Error updating leaderboard", error);
+    else await loadLeaderboard();
+  }
+
+  async function loadLeaderboard() {
+    const { data, error } = await supabaseClient
+      .from("leaderboard")
+      .select("*")
+      .order("best_net_worth", { ascending: false })
+      .limit(20);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const list = document.getElementById("leaderboard-list");
+    list.innerHTML = "";
+
+    let topNet = 0;
+    let players = data.length;
+    let myRank = "–";
+
+    data.forEach((row, index) => {
+      if (index === 0) topNet = row.best_net_worth;
+      if (currentUser && row.id === currentUser.id) {
+        myRank = "#" + (index + 1);
+      }
+
+      const rowEl = document.createElement("div");
+      rowEl.className = "leader-row rank-" + (index + 1);
+
+      const rank = document.createElement("div");
+      rank.className = "leader-rank";
+      rank.textContent = "#" + (index + 1);
+
+      const name = document.createElement("div");
+      name.className = "leader-name";
+      name.textContent = row.username || "Anonymous";
+
+      const net = document.createElement("div");
+      net.className = "leader-net";
+      net.textContent = fmtMoney(row.best_net_worth || 0);
+
+      const updated = document.createElement("div");
+      updated.className = "leader-updated";
+      updated.textContent = row.updated_at ? new Date(row.updated_at).toLocaleString() : "";
+
+      rowEl.appendChild(rank);
+      rowEl.appendChild(name);
+      rowEl.appendChild(net);
+      rowEl.appendChild(updated);
+
+      list.appendChild(rowEl);
+    });
+
+    document.getElementById("metric-top-net").textContent = fmtMoney(topNet || 0);
+    document.getElementById("metric-players").textContent = players;
+    document.getElementById("metric-rank").textContent = myRank;
+  }
+
+  // =========================
+  // Auth UI Handlers
+  // =========================
+  let authMode = "signin"; // or "signup"
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    const label = document.getElementById("auth-mode-label");
+    const submitLabel = document.getElementById("auth-submit-label");
+    const toggle = document.getElementById("toggle-auth");
+    const msg = document.getElementById("auth-message");
+    msg.innerHTML = "";
+
+    if (mode === "signin") {
+      label.textContent = "Sign In";
+      submitLabel.textContent = "Sign In";
+      toggle.textContent = "Switch to Sign Up";
+    } else {
+      label.textContent = "Create Account";
+      submitLabel.textContent = "Sign Up";
+      toggle.textContent = "Switch to Sign In";
+    }
+  }
+
+  document.getElementById("toggle-auth").addEventListener("click", () => {
+    setAuthMode(authMode === "signin" ? "signup" : "signin");
+  });
+
+  document.getElementById("auth-submit").addEventListener("click", async () => {
+    const email = document.getElementById("auth-email").value.trim();
+    const password = document.getElementById("auth-password").value.trim();
+    const username = document.getElementById("auth-username").value.trim();
+    const msg = document.getElementById("auth-message");
+    msg.innerHTML = "";
+
+    if (!email || !password) {
+      msg.innerHTML = '<div class="auth-error">Email and password are required.</div>';
+      return;
+    }
+
+    const btn = document.getElementById("auth-submit");
+    btn.disabled = true;
+
+    try {
+      if (authMode === "signin") {
+        await signIn(email, password);
+        msg.innerHTML = '<div class="auth-success">Signed in successfully.</div>';
+      } else {
+        await signUp(email, password, username || email.split("@")[0]);
+        msg.innerHTML = '<div class="auth-success">Account created. Check your email if confirmation is required.</div>';
+      }
+    } catch (err) {
+      console.error(err);
+      msg.innerHTML = '<div class="auth-error">' + (err.message || "Authentication error") + "</div>";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("logout-btn").addEventListener("click", async () => {
+    await signOut();
+  });
+
+  document.getElementById("refresh-leaderboard").addEventListener("click", () => {
+    loadLeaderboard();
+  });
+
+  // Market tab switching
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      renderMarket();
+    });
+  });
+
+  // =========================
+  // Init
+  // =========================
+  function initGame() {
+    // Initialize asset states
+    for (const asset of ALL_ASSETS) {
+      ensureAssetState(asset);
+    }
+    recalcPassiveIncome();
+    computeNetWorth();
+    computeRiskProfile();
+    renderStats(gameState.netWorth, gameState.riskScore);
+    renderMarket();
+    renderUpgrades();
+    renderEvents();
+    renderTicker();
+  }
+
+  initGame();
+  loadSession();
+
+  setInterval(tickMarket, TICK_INTERVAL_MS);
+</script>
+</body>
+</html>
